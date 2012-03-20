@@ -1,0 +1,26 @@
+{
+  "name": "gestalt",
+  "preferGlobal": "true",
+  "version": "0.0.1",
+  "author": "Chris Howe <chris@howeville.com>",
+  "description": "a configuration manaagment tool",
+  "main": "./lib/gestalt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/howech/gestalt.git"
+  },
+  "keywords": [
+    "configuration"
+  ],
+  "dependencies" : {
+      "underscore": "*"
+  },
+  "devDependencies": {
+  },
+  "bundleDependencies": [
+  ],
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.6"
+  }
+}
