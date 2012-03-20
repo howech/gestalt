@@ -16,6 +16,7 @@
       "underscore": "*"
   },
   "devDependencies": {
+      "vows": "*"
   },
   "bundleDependencies": [
   ],
