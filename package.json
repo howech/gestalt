@@ -13,7 +13,8 @@
     "configuration"
   ],
   "dependencies" : {
-      "underscore": "*"
+      "underscore": "*",
+      "yaml": "*",
   },
   "devDependencies": {
       "vows": "*"
