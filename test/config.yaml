@@ -9,8 +9,8 @@ test:
    six: 6
   -
    a: b
-   c: asdfasdf
+   c: asdfasd
 aaa: 
   bbb:
-    ccc: e
+    ccc: a
 
