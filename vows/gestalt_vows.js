@@ -1,4 +1,3 @@
-
 var vows = require('vows'),
     assert = require('assert');
 var EventEmitter = require('events').EventEmitter;
@@ -7,9 +6,11 @@ var _ = require('underscore');
 var config = require('../lib/gestalt');
 var Configuration = config.Configuration;
 var ConfigContainer = config.ConfigContainer;
+var ConfigFile = config.ConfigFile;
 var util = require('util');
 
 exports.configuration = vows.describe('gestalt configurtion object');
+
 exports.configuration.addBatch( {
     'basic config object': {
             topic: new Configuration("config object basics"),
@@ -330,7 +331,7 @@ exports.configuration.addBatch( {
         }
     },
     'overrides and defaults basics': {
-        "first change": {
+        "values without paths": {
             topic: function() {
                 var override = new Configuration('override');
                 var config = new Configuration('config');
@@ -346,7 +347,7 @@ exports.configuration.addBatch( {
                 config.set( "c", "normal");
                 defaults.set("b", "masked");
                 defaults.set("c", "masked");
-                defaults.set("d","defauilt");
+                defaults.set("d","default");
                 container.set("e", "container");
                 container.set("f", "masked");
     
@@ -358,15 +359,144 @@ exports.configuration.addBatch( {
             'overrides take precedence, defaults fill in gaps': function(container) {
                 assert.equal( container.get("a"), "override" );
                 assert.equal( container.get("b"), "override" );
-                //assert.equal( container.get("c"), "normal" );
+                assert.equal( container.get("c"), "normal" );
                 assert.equal( container.get("d"), "default" );
                 assert.equal( container.get("e"), "container" );
                 assert.equal( container.get("f"), "override" );
+            }
+        },
+        "values with paths": {
+            topic: function() {
+                var override = new Configuration('override');
+                var config = new Configuration('config');
+                var defaults = new Configuration('default');
+                var container = new ConfigContainer( 'container', {}, config );
+                container.addOverride( override );
+                container.addDefault( defaults );
+                container.set("a:b",1);
+                override.set("a:a",2);
+                defaults.set("a:c",3);
+                return container;
             },
-        }
+            'things work with paths, too': function(container) {
+                assert.equal( container.get("a:a") , 2);
+                assert.equal( container.get("a:b"), 1);
+                assert.equal( container.get("a:c"), 3);
+            }
+        },
+        "config container change events": {
+            topic: function() {
+                var container_changes = [];
+                var override_changes  = [];
+                var config_changes    = [];
+                var defaults_changes  = [];
+                
+                var override = new Configuration('override');
+                var config = new Configuration('config');
+                var defaults = new Configuration('default');
+                var container = new ConfigContainer( 'container', {}, config );
+                
+                override.on('change',  function(change) { override_changes.push( change );  } );
+                config.on('change',    function(change) { config_changes.push( change );    } );
+                defaults.on('change',  function(change) { defaults_changes.push( change );  } );
+                container.on('change', function(change) { container_changes.push( change ); } );
+
+                container.addOverride( override );
+                container.addDefault( defaults );
+
+                defaults.set("a", "default");
+                container.set("a", "container");
+                override.set("a", "override");
+                
+                defaults.set("b", "default");
+                override.set("b", "override");
+                container.set("b", "container");
+
+                container.set("c", "container");
+                defaults.set("c", "default");
+                override.set("c", "override");
+
+                container.set("d", "container");
+                defaults.set("d", "default");
+                override.set("d", "override");
+
+                override.set("e", "override");
+                defaults.set("e", "default");
+                container.set("e", "container");
+
+                override.set("f", "override");
+                container.set("f", "container");
+                defaults.set("f", "default");                
+                
+                return  { 
+                    container: container_changes,
+                    override: override_changes,
+                    config: config_changes,
+                    defaults: defaults_changes
+                };
+            },
+            'change lengths': function( changes ) {
+                assert.lengthOf( changes.defaults, 6 );
+                assert.lengthOf( changes.config, 6);
+                assert.lengthOf( changes.override, 6);
+                assert.lengthOf( changes.container,11); 
+            }
+        }                    
     }
 });
 
-
+exports.configuration.addBatch( {
+    'config file object': {
+        "json file": {
+            topic: function() {
+                var promise = new EventEmitter();
+                var config_json = require.resolve('./files/config.json');
+                var config = new ConfigFile( config_json, {format: 'json'} );
+                config.on('invalid', function() { promise.emit('failure', config); });
+                config.on('loaded',  function() { promise.emit('success', config); });
+                return promise;
+            },
+            'loads properly': function(config) {
+                assert.instanceOf( config, Configuration);
+                assert.instanceOf( config, ConfigFile );
+                assert.deepEqual( config.toObject(), { "test1": "a", "test2": "b", "test3": {"c": "d", "e": ["f","g","h"] } , "test4": "i" } );
+            }        
+        },
+        "yaml file": {
+            topic: function() {
+                var promise = new EventEmitter();
+                var config_yaml = require.resolve('./files/config.yaml');
+                var config = new ConfigFile( config_yaml, {format: 'yaml'} );
+                config.on('invalid', function() { promise.emit('failure', config); });
+                config.on('loaded',  function() { promise.emit('success', config); });
+                return promise;
+            },
+            'loads properly': function(config) {
+                assert.instanceOf( config, Configuration);
+                assert.instanceOf( config, ConfigFile );
+                var contents = { test: [ {one:1, two:2, three:3}, {four:2, five:5,six:6}, {a: 'b', c: 'asdfasd' } ],
+                                  aaa: { bbb: { ccc: 'a' } } };                                                  
+                assert.deepEqual( config.toObject(), contents );
+            }        
+        },
+        "ini file": {
+            topic: function() {
+                var promise = new EventEmitter();
+                var config_ini = require.resolve('./files/config.ini');
+                var config = new ConfigFile( config_ini, {format: 'ini'} );
+                config.on('invalid', function() { promise.emit('failure', config); });
+                config.on('loaded',  function() { promise.emit('success', config); });
+                //config.emit('loaded');
+                return promise;
+            },
+            'loads properly': function(config) {
+                assert.instanceOf( config, Configuration);
+                assert.instanceOf( config, ConfigFile );
+                var contents = { top: 'level', one: {stuff: 'more stuff'}, two: {x: 'y'} };
+                assert.deepEqual( config.toObject(), contents );
+            }        
+        } //,
+    }
+});
 
 exports.configuration.run();

@@ -1,6 +1,0 @@
-{ 
-    "test1": "asdf", 
-    "test2": "fdsa",
-    "test3": {"a": "a", "b": [1,2,3] } ,
-    "zzz": "qqq"
-}
