@@ -363,7 +363,11 @@ exports.configuration.addBatch( {
                 assert.equal( container.get("d"), "default" );
                 assert.equal( container.get("e"), "container" );
                 assert.equal( container.get("f"), "override" );
-            }
+            },
+            //'report': function(container) {
+            //    container.report();
+            //    assert.equal(1,1);
+            //}
         },
         "values with paths": {
             topic: function() {
@@ -382,7 +386,11 @@ exports.configuration.addBatch( {
                 assert.equal( container.get("a:a") , 2);
                 assert.equal( container.get("a:b"), 1);
                 assert.equal( container.get("a:c"), 3);
-            }
+            },
+            //'report': function(container) {
+            //    container.report();
+            //    assert.equal(1,1);
+            //}
         },
         "config container change events": {
             topic: function() {
