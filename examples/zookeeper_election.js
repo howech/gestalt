@@ -10,9 +10,11 @@ zkc.on('change', function(obj) {
 	console.log("change: %j", obj );
     }
 });
+
 zkc.on('loaded', function(a,b) {
     //console.log("loaded");
 });
+
 zkc.on('invalid', function(a,b) {
     //console.log("invalid: %s %s",a,b);
 });
@@ -33,11 +35,11 @@ function watch_leader(zk,dir,me,path) {
 	    // need to watch someone else.
 	    election(zk,dir,me);
 	} else if( type == ZooKeeper.ZOO_SESSION_EVENT ) {
-	    console.log("Session problem!");
-	    zk.aw_get( path, lw, function() {} );
+	    //console.log("Session problem!");
+	    // zk will keep our callback around - no need to re-establish.
 	} else {
 	    console.log( "Unkown type: " + type );
-	    zk.aw_get( path, lw, function() {} );
+	    //zk.aw_get( path, lw, function() {} );
 	} 
     };
     zk.aw_get( path, lw, function() {} ); 
