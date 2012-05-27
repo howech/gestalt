@@ -6,9 +6,13 @@ var name = null;
 var zkc = new ZookeeperConfig('zk://localhost:2181/chh/xxx', {format: 'raw'});
 
 zkc.on('change', function(obj) {
-    if( obj.name == "children:leader:data" ) {
-	console.log("change: %j", obj );
-    }
+   // if( obj.name == "children:leader:data" ) {
+//	console.log("change: %j", obj );
+//    }
+});
+
+zkc.patternListen( /^children:leader:data$/, function( change ) {
+    console.log("change %j",change);
 });
 
 zkc.on('loaded', function(a,b) {
