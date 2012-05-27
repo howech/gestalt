@@ -160,16 +160,16 @@ exports.configuration.addBatch( {
                 var lop2 = config.get("path:to:somewhere");
                 
                 config.set("path:to:somewhere", "xxx" );     // change 4
-                config.remove("path:to:nowhere");            // change 5 
+                config.remove("path:to:nowhere");            // change 5 and 6
                 
                 lop2.set("a", "qqq"); // not a change
                 lop1.set("x", "zzz"); // not a change
                                 
-                config.set("q", lop2); // change 6
-                config.set("r", lop2); // change 7
-                config.set("s", lop1); // change 8
+                config.set("q", lop2); // change 7
+                config.set("r", lop2); // change 8
+                config.set("s", lop1); // change 9
                 
-                config.set("q:a", "qrqr" ); // changes 9 and 10
+                config.set("q:a", "qrqr" ); // changes 11 and 10
                 return changes;
             },
             "change for path:to:somewhere:a": function( changes ) { 
@@ -197,24 +197,26 @@ exports.configuration.addBatch( {
             //},
             "change removal of path:to:nowhere": function( changes ) { 
                 assert.isUndefined( changes[5].value );
-                assert.equal( changes[5].name, "path:to:nowhere" );
+                assert.equal( changes[5].name, "path:to:nowhere:x" );
+                assert.isUndefined( changes[6].value );
+                assert.equal( changes[6].name, "path:to:nowhere:y" );
             },
             "add lop2 back to tree twice": function(changes) {
-                assert.equal( changes[6].name, "q" );
-                assert.equal( changes[7].name, "r" );
-                assert.isUndefined( changes[6].old_value );
+                assert.equal( changes[7].name, "q" );
+                assert.equal( changes[8].name, "r" );
                 assert.isUndefined( changes[7].old_value );
-                assert.equal( changes[6].value, changes[7].value );
+                assert.isUndefined( changes[8].old_value );
+                assert.equal( changes[7].value, changes[8].value );
             },
             "add lop1 back to tree": function(changes) {
-                assert.equal( changes[8].name, "s" );
-                assert.isUndefined( changes[8].old_value );
+                assert.equal( changes[9].name, "s" );
+                assert.isUndefined( changes[9].old_value );
             },
             "change in lop2 now generates two changes in treee": function(changes) {
-                assert.equal( changes[9].value, changes[10].value );
-                assert.deepEqual( [ changes[9].name, changes[10].name].sort(), ["q:a", "r:a" ] );
+                assert.equal( changes[10].value, changes[11].value );
+                assert.deepEqual( [ changes[10].name, changes[11].name].sort(), ["q:a", "r:a" ] );
             },
-            "thats all folks": function(changes) { assert.lengthOf( changes, 11 ); }
+            "thats all folks": function(changes) { assert.lengthOf( changes, 12 ); }
         },
         "_touch_ structured configs": {
             topic: function() {

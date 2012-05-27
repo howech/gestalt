@@ -14,7 +14,9 @@
   ],
   "dependencies" : {
       "underscore": "*",
-      "yaml": "*"
+      "yaml": "*",
+      "iniparser": "*",
+      "zookeeper": "*"
   },
   "devDependencies": {
       "vows": "*"
