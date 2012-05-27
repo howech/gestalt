@@ -1,0 +1,9 @@
+new:
+   foo: 1
+   bar: 2
+   baz: 3
+more:
+   x: a
+   y: b
+   z: Longer line of stuff.
+

@@ -1,4 +1,6 @@
-a = require('../lib/args'); 
-c = new a.ConfigArgs();
+var gestalt = require('../lib/gestalt');
+var ConfigArgs = gestalt.ConfigArgs;
+
+c = new ConfigArgs();
 console.log( c.get('foo') );
 c.report();

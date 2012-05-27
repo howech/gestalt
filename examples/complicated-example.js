@@ -3,6 +3,7 @@ var ConfigEnv = gestalt.ConfigEnv;
 var RemapConfig = gestalt.RemapConfig; 
 var ConfigArgs = gestalt.ConfigArgs;
 var ConfigContainer = gestalt.ConfigContainer;
+var ConfigFile = gestalt.ConfigFile;
 
 function env_mapper(old) {
     if( old.match(/^f/ )) {
@@ -23,7 +24,8 @@ function args_mapper(old) {
 
 var e = new ConfigEnv();
 var a = new ConfigArgs();
-
+var yaml_file = require.resolve('./config.yaml');
+var f = new ConfigFile(yaml_file, {format: 'yaml'});
 var re = new RemapConfig( env_mapper, e );
 var ra = new RemapConfig( args_mapper, a );
 
@@ -31,5 +33,10 @@ var config = new ConfigContainer("config",{});
 config.addOverride( re );
 config.addOverride( ra );
 
-console.log( config.get('new:foo') );
-config.report();
+setTimeout( function() {
+    config.addDefault( f );
+    console.log( config.get('new:foo') );
+    config.set('new:foo','ZZZZ');
+    console.log( config.get('new:foo') );
+    config.report();
+},1000);
