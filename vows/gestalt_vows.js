@@ -481,7 +481,7 @@ exports.configuration.addBatch( {
 		 [ {name:"a", value: 1, old_value: undefined, source:"default" },
 		   {name:"a", value: 2, old_value: 1, source:"container" },
 		   {name:"a", value: 3, old_value: 2, source:"override" },
-		   {name:"a", value: 5, old_value: 3, source:"default" }
+		   {name:"a", value: 5, old_value: 3, source:"override" }
 		 ]); 
             }
         }                                        
