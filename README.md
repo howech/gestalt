@@ -26,6 +26,8 @@ values for particular settings came from.
 
 The basic object is a Configuration:
 
+~~~
+
    var gestalt = require('gestalt');
    var options = {};
    var config = new gestalt.Configuration("Source", options );
@@ -37,8 +39,12 @@ The basic object is a Configuration:
    var x = config.get("x");  // returns 'stuff'
    var y = config.get("y");  // returns 6
 
+~~~
+
 Configuration names are hierarchical - use a ':' to delimit namespaces. 
 The namespaces become nested Configuration objects.
+
+~~~
 
    config.set("owner:name", 'Joe');
    config.set("owner:phone", '5551234');
@@ -47,12 +53,18 @@ The namespaces become nested Configuration objects.
    var owner = ownerConfig.toObject();    // convert to a plain javascript object:
                                           // { name: 'Joe', phone: '5551234' }
  
+~~~
+
 Values can be primative values (numbers, strings, booleans,
 etc.). Assignments of structured objects get destructured into nested
 Configuration objects.
 
+~~~
+
    config.set("neighbor", {name: 'Fred', phone: '5559876'} );
    var fred_phone = config.get( 'neighbor:phone' );
+
+~~~
 
 In many cases (not quite all...this is not yet supported for
 RemapConfig objects...) it is possible to turn a configuration object
@@ -65,6 +77,8 @@ array.
 Configuration objects are EventEmitters. When a value of a
 configuration object changes, it emits a 'change' event.
 
+~~~
+
    config.on('change', function( change) {
      console.log("name: %s, value: %s, old_value: %s, source: %s ",
         change.name, change.value, change.old_value, change.source);
@@ -73,6 +87,8 @@ configuration object changes, it emits a 'change' event.
    config.set("owner:phone", "5554444", "phone book");
    // listener prints
    // name: owner:phone, value: 5554444, old_value: 5551234, source: phone book
+
+~~~
 
 You can also listen to events on the nested configuration objects. Note
 that configuration names in the events are reported relative to the configuration
