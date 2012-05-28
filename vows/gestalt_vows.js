@@ -451,7 +451,40 @@ exports.configuration.addBatch( {
                 assert.lengthOf( changes.override, 6);
                 assert.lengthOf( changes.container,11); 
             }
-        }                    
+        },
+        "more config container change events": {
+            topic: function() {
+                var changes = [];
+                
+                var override = new Configuration('override');
+                var defaults = new Configuration('default');
+                var container = new ConfigContainer( 'container');
+                
+                container.on('change', function(change) { changes.push( change ); } );
+
+                container.addOverride( override );
+                container.addDefault( defaults );
+
+                defaults.set("a",  1); // change 0
+                container.set("a", 2); // change 1
+                override.set("a",  3); // change 2
+                
+		container.set("a", 4); // no change
+		defaults.set("a", 5);  // no change
+		container.remove("a"); // no change
+		override.remove("a");  // change 3
+
+                return  changes;
+            },
+            'changes': function( changes ) {
+		assert.deepEqual( changes, 
+		 [ {name:"a", value: 1, old_value: undefined, source:"default" },
+		   {name:"a", value: 2, old_value: 1, source:"container" },
+		   {name:"a", value: 3, old_value: 2, source:"override" },
+		   {name:"a", value: 5, old_value: 3, source:"default" }
+		 ]); 
+            }
+        }                                        
     }
 });
 
