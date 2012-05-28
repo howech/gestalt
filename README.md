@@ -104,34 +104,36 @@ configuration file, this class can help you out.
 
 ~~~
 
-    var override = new gestalt.Configuration("Override");
-    var def = new gestalt.Configuration("Default");
-    var container = new gestalt.ContainerConfig("Container");
-    container.addOverride( override );
-    container.addDefault(def);
+var override = new gestalt.Configuration("Override");
+var def = new gestalt.Configuration("Default");
+var container = new gestalt.ConfigContainer("Container");
 
-    container.on( 'change', function(change) { console.log("%j", source ) } );
+container.addOverride( override );
+container.addDefault(def);
 
-    default.set("a",1);
-    // logs {"name":"a", "value":1, "source":"Default" }
+container.on( 'change',function(change) { 
+    console.log("%j", change ); 
+});
 
-    container.set("a",2);
-    // logs {"name":"a", "value":2, "old_value": 1, "source":"Container" }
+def.set("a",1);
+// logs {"name":"a", "value":1, "source":"Default" }
 
-    override.set("a":3);
-    // logs {"name":"a", "value":3, "old_value": 2, "source":"Override" }
+container.set("a",2);
+// logs {"name":"a", "value":2, "old_value": 1, "source":"Container" }
 
-    container.set("a",4);
-    // logs nothing - overall value does not change
+override.set("a",3);
+// logs {"name":"a", "value":3, "old_value": 2, "source":"Override" }
 
-    def.set("a",5);
-    // also logs nothing
+container.set("a",4);
+// logs nothing - overall value does not change
 
-    container.remove("a");
-    // logs nothing
+def.set("a",5);
+// also logs nothing
 
-    override.remove("a");
-    // logs {"name":"a", "value":5, "old_value":3, "source":"Default" }
+container.remove("a");
+// logs nothing
 
+override.remove("a");
+// logs {"name":"a", "value":5, "old_value":3, "source":"Default" }
 
 ~~~
