@@ -10,7 +10,7 @@ function mapper(old) {
 }
 
 var c = new ConfigEnv();
-var r = new RemapConfig( mapper, c );
+var r = new RemapConfig( { mapper: mapper, original: c } );
 
 console.log( r.get('new:foo') );
 console.log( r.keys() );

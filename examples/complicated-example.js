@@ -25,11 +25,11 @@ function args_mapper(old) {
 var e = new ConfigEnv();
 var a = new ConfigArgs();
 var yaml_file = require.resolve('./config.yaml');
-var f = new ConfigFile(yaml_file, {format: 'yaml'});
-var re = new RemapConfig( env_mapper, e );
-var ra = new RemapConfig( args_mapper, a );
+var f = new ConfigFile({ source: yaml_file, format: 'yaml'});
+var re = new RemapConfig( { mapper: env_mapper, original: e } );
+var ra = new RemapConfig( { mapper: args_mapper, original: a } );
 
-var config = new ConfigContainer("config",{});
+var config = new ConfigContainer({ source: "config" });
 config.addOverride( re );
 config.addOverride( ra );
 

@@ -1,12 +1,13 @@
-var ZookeeperConfig = require('../lib/zookeeper').ZookeeperConfig;
+var gestalt = require('../lib/gestalt');
+var ZookeeperConfig = gestalt.ZookeeperConfig;
 var ZooKeeper = require('zookeeper');
 var _ = require('underscore');
 var name = null;
 
-var zkc = new ZookeeperConfig('zk://localhost:2181/chh/xxx', {format: 'raw'});
+var zkc = new ZookeeperConfig({ source: 'zk://localhost:2181/chh/xxx', format: 'raw'});
 
 zkc.on('change', function(obj) {
-   // if( obj.name == "children:leader:data" ) {
+// if( obj.name == "children:leader:data" ) {
 //	console.log("change: %j", obj );
 //    }
 });

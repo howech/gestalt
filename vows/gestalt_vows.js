@@ -13,7 +13,7 @@ exports.configuration = vows.describe('gestalt configurtion object');
 
 exports.configuration.addBatch( {
     'basic config object': {
-            topic: new Configuration("config object basics"),
+            topic: new Configuration({source: "config object basics"}),
             'should be an object':          function(config) { assert.instanceOf(config,Configuration); },
             'should be an EventEmitter':    function(config) { assert.instanceOf(config,EventEmitter); },
             'should have a get method':     function(config) { assert.isFunction( config.get ); },
@@ -109,7 +109,7 @@ exports.configuration.addBatch( {
             topic: function() {
                 var promise = new EventEmitter();
                 var changes = [];
-                var config = new Configuration("Configuration Emitter");
+                var config = new Configuration({source: "Configuration Emitter"});
                 config.on('change', function( change ) {
                     changes.push( change );
                     if(changes.length == 2)
@@ -135,7 +135,7 @@ exports.configuration.addBatch( {
             topic: function() {
                 var promise = new EventEmitter();
                 var changes = [];
-                var config = new Configuration("Configuration Emitter");
+                var config = new Configuration({source: "Configuration Emitter"});
                 config.on('change', function(change ) {
                     changes.push(change);
                 });
@@ -150,7 +150,7 @@ exports.configuration.addBatch( {
         "changes to structured configs": {
             topic: function() {
                 var changes = [];
-                var config = new Configuration("Emit");
+                var config = new Configuration({source: "Emit"});
                 config.on('change', function( change ) { changes.push(change); });
                 config.set("path:to:somewhere:a", "a_value");  // change 0
                 config.set("path:to:nowhere:x", "a_value");  // change 1
@@ -221,7 +221,7 @@ exports.configuration.addBatch( {
         "_touch_ structured configs": {
             topic: function() {
                 var changes = [];
-                var config = new Configuration("_touch_");
+                var config = new Configuration({source: "_touch_"});
                 config.set("path:to:somewhere:a", "a_value");  
                 config.set("path:to:nowhere:x", "a_value");    
                 config.set("path:to:nowhere:y", "a_value");    
@@ -244,7 +244,7 @@ exports.configuration.addBatch( {
 
 exports.configuration.addBatch( {
     'config container object': {
-            topic: new ConfigContainer("config container basics"),
+            topic: new ConfigContainer({source: "config container basics"}),
             'should be an object':          function(config) { assert.instanceOf(config,ConfigContainer); },
             'should be a Container':        function(config) { assert.instanceOf(config,Configuration); },
             'should be an EventEmitter':    function(config) { assert.instanceOf(config,EventEmitter); },
@@ -335,10 +335,10 @@ exports.configuration.addBatch( {
     'overrides and defaults basics': {
         "values without paths": {
             topic: function() {
-                var override = new Configuration('override');
-                var config = new Configuration('config');
-                var defaults = new Configuration('default');
-                var container = new ConfigContainer( 'container', {}, config );
+                var override = new Configuration({source: 'override'});
+                var config = new Configuration({source: 'config'});
+                var defaults = new Configuration({source: 'default'});
+                var container = new ConfigContainer( {source: 'container', config: config} );
                 container.addOverride( override );
                 container.addDefault( defaults );
                 
@@ -373,10 +373,10 @@ exports.configuration.addBatch( {
         },
         "values with paths": {
             topic: function() {
-                var override = new Configuration('override');
-                var config = new Configuration('config');
-                var defaults = new Configuration('default');
-                var container = new ConfigContainer( 'container', {}, config );
+                var override = new Configuration({source: 'override'});
+                var config = new Configuration({source: 'config'});
+                var defaults = new Configuration({source: 'default'});
+                var container = new ConfigContainer( { source: 'container', config: config} );
                 container.addOverride( override );
                 container.addDefault( defaults );
                 container.set("a:b",1);
@@ -401,10 +401,10 @@ exports.configuration.addBatch( {
                 var config_changes    = [];
                 var defaults_changes  = [];
                 
-                var override = new Configuration('override');
-                var config = new Configuration('config');
-                var defaults = new Configuration('default');
-                var container = new ConfigContainer( 'container', {}, config );
+                var override = new Configuration({ source: 'override'});
+                var config = new Configuration({source: 'config'});
+                var defaults = new Configuration({source: 'default'});
+                var container = new ConfigContainer( {source: 'container', config: config} );
                 
                 override.on('change',  function(change) { override_changes.push( change );  } );
                 config.on('change',    function(change) { config_changes.push( change );    } );
@@ -456,9 +456,9 @@ exports.configuration.addBatch( {
             topic: function() {
                 var changes = [];
                 
-                var override = new Configuration('override');
-                var defaults = new Configuration('default');
-                var container = new ConfigContainer( 'container');
+                var override = new Configuration({source: 'override'});
+                var defaults = new Configuration({source: 'default'});
+                var container = new ConfigContainer({source: 'container'});
                 
                 container.on('change', function(change) { changes.push( change ); } );
 
@@ -494,7 +494,7 @@ exports.configuration.addBatch( {
             topic: function() {
                 var promise = new EventEmitter();
                 var config_json = require.resolve('./files/config.json');
-                var config = new ConfigFile( config_json, {format: 'json'} );
+                var config = new ConfigFile( {source: config_json, format: 'json'} );
                 config.on('invalid', function() { promise.emit('failure', config); });
                 config.on('loaded',  function() { promise.emit('success', config); });
                 return promise;
@@ -509,7 +509,7 @@ exports.configuration.addBatch( {
             topic: function() {
                 var promise = new EventEmitter();
                 var config_yaml = require.resolve('./files/config.yaml');
-                var config = new ConfigFile( config_yaml, {format: 'yaml'} );
+                var config = new ConfigFile( {source: config_yaml, format: 'yaml'} );
                 config.on('invalid', function() { promise.emit('failure', config); });
                 config.on('loaded',  function() { promise.emit('success', config); });
                 return promise;
@@ -526,7 +526,7 @@ exports.configuration.addBatch( {
             topic: function() {
                 var promise = new EventEmitter();
                 var config_ini = require.resolve('./files/config.ini');
-                var config = new ConfigFile( config_ini, {format: 'ini'} );
+                var config = new ConfigFile( { source: config_ini, format: 'ini'} );
                 config.on('invalid', function() { promise.emit('failure', config); });
                 config.on('loaded',  function() { promise.emit('success', config); });
                 //config.emit('loaded');

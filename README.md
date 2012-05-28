@@ -28,16 +28,16 @@ The basic object is a Configuration:
 
 ~~~
 
-   var gestalt = require('gestalt');
-   var options = {};
-   var config = new gestalt.Configuration("Source", options );
+var gestalt = require('gestalt');
+var options = {source: 'Source'};
+var config = new gestalt.Configuration( options );
 
-   // config.set( name, value, source )
-   config.set("x", 'stuff');   // source defaults to the config source
-   config.set("y", 6, 'HERE'); // but source can be set per-value
+// config.set( name, value, source )
+config.set("x", 'stuff');   // source defaults to the config source
+config.set("y", 6, 'HERE'); // but source can be set per-value
 
-   var x = config.get("x");  // returns 'stuff'
-   var y = config.get("y");  // returns 6
+var x = config.get("x");  // returns 'stuff'
+var y = config.get("y");  // returns 6
 
 ~~~
 
@@ -46,12 +46,12 @@ The namespaces become nested Configuration objects.
 
 ~~~
 
-   config.set("owner:name", 'Joe');
-   config.set("owner:phone", '5551234');
+config.set("owner:name", 'Joe');
+config.set("owner:phone", '5551234');
 
-   var ownerConfig = config.get('owner'); // another Configuration object
-   var owner = ownerConfig.toObject();    // convert to a plain javascript object:
-                                          // { name: 'Joe', phone: '5551234' }
+var ownerConfig = config.get('owner'); // another Configuration object
+var owner = ownerConfig.toObject();    // convert to a plain javascript object:
+                                       // { name: 'Joe', phone: '5551234' }
  
 ~~~
 
@@ -61,8 +61,8 @@ Configuration objects.
 
 ~~~
 
-   config.set("neighbor", {name: 'Fred', phone: '5559876'} );
-   var fred_phone = config.get( 'neighbor:phone' );
+config.set("neighbor", {name: 'Fred', phone: '5559876'} );
+var fred_phone = config.get( 'neighbor:phone' );
 
 ~~~
 
@@ -79,14 +79,14 @@ configuration object changes, it emits a 'change' event.
 
 ~~~
 
-   config.on('change', function( change) {
-     console.log("name: %s, value: %s, old_value: %s, source: %s ",
+config.on('change', function( change) {
+    console.log("name: %s, value: %s, old_value: %s, source: %s ",
         change.name, change.value, change.old_value, change.source);
-   });
+});
 
-   config.set("owner:phone", "5554444", "phone book");
-   // listener prints
-   // name: owner:phone, value: 5554444, old_value: 5551234, source: phone book
+config.set("owner:phone", "5554444", "phone book");
+// listener prints
+// name: owner:phone, value: 5554444, old_value: 5551234, source: phone book
 
 ~~~
 
@@ -104,9 +104,9 @@ configuration file, this class can help you out.
 
 ~~~
 
-var override = new gestalt.Configuration("Override");
-var def = new gestalt.Configuration("Default");
-var container = new gestalt.ConfigContainer("Container");
+var override = new gestalt.Configuration({source: "Override"});
+var def = new gestalt.Configuration({source: "Default"});
+var container = new gestalt.ConfigContainer({source: "Container"});
 
 container.addOverride( override );
 container.addDefault(def);

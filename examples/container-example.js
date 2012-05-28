@@ -1,8 +1,8 @@
 var gestalt = require('../lib/gestalt');
 
-var override = new gestalt.Configuration("Override");
-var def = new gestalt.Configuration("Default");
-var container = new gestalt.ConfigContainer("Container");
+var override = new gestalt.Configuration({source: "Override"});
+var def = new gestalt.Configuration({source: "Default"});
+var container = new gestalt.ConfigContainer({source: "Container"});
 
 container.addOverride( override );
 container.addDefault(def);
