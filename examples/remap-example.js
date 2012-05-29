@@ -1,5 +1,7 @@
-var ConfigEnv = require('../lib/env').ConfigEnv;
-var RemapConfig = require('../lib/remap').RemapConfig; 
+
+var gestalt       = require('../lib/gestalt'),
+    Configuration = gestalt.Configuration,
+    RemapConfig   = gestalt.RemapConfig; 
 
 function mapper(old) {
     if( old.match(/^f/ )) {
@@ -9,7 +11,12 @@ function mapper(old) {
     }
 }
 
-var c = new ConfigEnv();
+var c = new Configuration();
+c.set("foo",1);
+c.set("fab",2);
+c.set("far:blah",3);
+c.set("gak",4);
+
 var r = new RemapConfig( { mapper: mapper, original: c } );
 
 console.log( r.get('new:foo') );
