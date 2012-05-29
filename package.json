@@ -1,7 +1,7 @@
 {
   "name": "gestalt",
   "preferGlobal": "true",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Chris Howe <chris@howeville.com>",
   "description": "a configuration manaagment tool",
   "main": "./lib/gestalt",
@@ -14,7 +14,7 @@
   ],
   "dependencies" : {
       "underscore": "*",
-      "yaml": "*",
+      "js-yaml": "*",
       "iniparser": "*",
       "zookeeper": "*"
   },
