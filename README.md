@@ -26,7 +26,7 @@ values for particular settings came from.
 
 The basic object is a Configuration:
 
-~~~
+```javascript
 
 var gestalt = require('gestalt');
 var options = {source: 'Source'};
@@ -39,12 +39,12 @@ config.set("y", 6, 'HERE'); // but source can be set per-value
 var x = config.get("x");  // returns 'stuff'
 var y = config.get("y");  // returns 6
 
-~~~
+```
 
 Configuration names are hierarchical - use a ':' to delimit namespaces. 
 The namespaces become nested Configuration objects.
 
-~~~
+```javascript
 
 config.set("owner:name", 'Joe');
 config.set("owner:phone", '5551234');
@@ -53,18 +53,18 @@ var ownerConfig = config.get('owner'); // another Configuration object
 var owner = ownerConfig.toObject();    // convert to a plain javascript object:
                                        // { name: 'Joe', phone: '5551234' }
  
-~~~
+```
 
 Values can be primative values (numbers, strings, booleans,
 etc.). Assignments of structured objects get destructured into nested
 Configuration objects.
 
-~~~
+```javascript
 
 config.set("neighbor", {name: 'Fred', phone: '5559876'} );
 var fred_phone = config.get( 'neighbor:phone' );
 
-~~~
+```
 
 In many cases (not quite all...this is not yet supported for
 RemapConfig objects...) it is possible to turn a configuration object
@@ -77,7 +77,7 @@ array.
 Configuration objects are EventEmitters. When a value of a
 configuration object changes, it emits a 'change' event.
 
-~~~
+```javascript
 
 config.on('change', function( change) {
     console.log("name: %s, value: %s, old_value: %s, source: %s ",
@@ -88,7 +88,7 @@ config.set("owner:phone", "5554444", "phone book");
 // listener prints
 // name: owner:phone, value: 5554444, old_value: 5551234, source: phone book
 
-~~~
+```
 
 You can also listen to events on the nested configuration objects. Note
 that configuration names in the events are reported relative to the configuration
@@ -102,7 +102,7 @@ different sources. For instance, if you allow configuration parameters
 to be set at the command line, in environment variables, or from a
 configuration file, this class can help you out.
 
-~~~
+```javascript
 
 var override = new gestalt.Configuration({source: "Override"});
 var def = new gestalt.Configuration({source: "Default"});
@@ -136,7 +136,7 @@ container.remove("a");
 override.remove("a");
 // logs {"name":"a", "value":5, "old_value":3, "source":"Default" }
 
-~~~
+```
 
 ## Remap Configs
 
@@ -152,7 +152,7 @@ the options argument. First, it needs a reference to the original
 configuration object that is being remapped. Second, it needs a function
 that will map names from the original object into the new object space.
 
-~~~
+```javascript
 
 var gestalt       = require('../lib/gestalt'),
     Configuration = gestalt.Configuration,
@@ -179,7 +179,7 @@ var r = new RemapConfig( { mapper: mapper, original: c } );
 console.log( r.get('new:foo') );
 // prints out "1"
 
-~~~
+```
 
 Not surprisingly, there are a couple of restrictions on this type of
 configuration object. First, it is read only. Second, the remapper
