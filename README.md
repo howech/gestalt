@@ -137,3 +137,57 @@ override.remove("a");
 // logs {"name":"a", "value":5, "old_value":3, "source":"Default" }
 
 ~~~
+
+## Remap Configs
+
+Configuration files are often structured, while environment variables
+and command line arguments are usually not structured. However, it is
+often the case that a program will use an environment variable or a
+command line argument to override a setting in a structured
+document. RemapConfig objects give you a formal way to show exactly
+what part of the structure a given command line argument will override.
+
+The constructor for RemapConfig expects to see a couple of options in
+the options argument. First, it needs a reference to the original
+configuration object that is being remapped. Second, it needs a function
+that will map names from the original object into the new object space.
+
+~~~
+
+var gestalt       = require('../lib/gestalt'),
+    Configuration = gestalt.Configuration,
+    RemapConfig   = gestalt.RemapConfig; 
+
+
+function mapper(old) {
+    // map names that start with "f" to
+    // new:<old_name>
+    if( old.match(/^f/ )) {
+	return "new:" + old;	
+    } else {
+	// ignore everything else
+	return undefined;
+    }
+}
+
+var c = new Configuration();
+c.set("foo",1);
+c.set("gak",4);
+
+var r = new RemapConfig( { mapper: mapper, original: c } );
+
+console.log( r.get('new:foo') );
+// prints out "1"
+
+~~~
+
+Not surprisingly, there are a couple of restrictions on this type of
+configuration object. First, it is read only. Second, the remapper
+function can show that it ignores part of the object space by
+returning undefined for some values. For the rest of the values, it
+must make sure to return unique new names for different old names.
+Third, the toObject function does not try to detect array-like
+objects.
+
+Remapped objects do pass on events, and can be used as overrides or
+defaults in a config container. 

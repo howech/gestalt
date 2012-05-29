@@ -1,12 +1,15 @@
-
 var gestalt       = require('../lib/gestalt'),
     Configuration = gestalt.Configuration,
     RemapConfig   = gestalt.RemapConfig; 
 
+
 function mapper(old) {
+    // map names that start with "f" to
+    // new:<old_name>
     if( old.match(/^f/ )) {
 	return "new:" + old;	
     } else {
+	// ignore everything else
 	return undefined;
     }
 }
@@ -20,5 +23,4 @@ c.set("gak",4);
 var r = new RemapConfig( { mapper: mapper, original: c } );
 
 console.log( r.get('new:foo') );
-console.log( r.keys() );
-r.report();
+// prints out "1"
