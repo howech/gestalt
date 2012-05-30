@@ -1,0 +1,34 @@
+cluster:
+   name: default
+zookeeper: 
+   options: 
+     connect: "zk://localhost:2191"
+   election: /election
+   names: /names
+   config: /config
+names:
+   - Alpha
+   - Bravo
+   - Charlie
+   - Delta
+   - Echo
+   - Foxtrot
+   - Golf
+   - Hotel
+   - Indigo
+   - Juliett
+   - Kilo
+   - Lima
+   - Mike
+   - November
+   - Oscar
+   - Papa
+   - Quebec
+   - Romeo
+   - Siera
+   - Tango
+   - Uniform
+   - Whiskey 
+   - X-ray
+   - Yankee
+   - Zulu

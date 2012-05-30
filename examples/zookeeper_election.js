@@ -17,7 +17,7 @@ zkc.patternListen( /^children:leader:data$/, function( change ) {
 });
 
 zkc.on('loaded', function(a,b) {
-    //console.log("loaded");
+    console.log("loaded");
 });
 
 zkc.on('invalid', function(a,b) {
@@ -69,6 +69,7 @@ function election(zk, dir, me) {
 }
 
 zkc.zookeeper( function(zk) {
+    console.log("creating temp node");
     zk.a_create("/chh/temp/node","stuff", ZooKeeper.ZOO_SEQUENCE + ZooKeeper.ZOO_EPHEMERAL ,function (rc, error, path)  {
         if (rc != 0) {
             console.log ("zk node create result: %d, error: '%s', path=%s", rc, error, path);
@@ -88,13 +89,15 @@ var setup_exit = function() {
     process.on('SIGINT', f );
     setTimeout( function() { process.removeListener('SIGINT', f); setup_report();}, 300);
 };
+
 var setup_report = function() {
     process.on('SIGINT', function () {
         zkc.report("  ");
         setup_exit();
     });
 };
+
 setup_report();
 
-
+setTimeout( function() {console.log("10 seconds...");} , 10000);
 
