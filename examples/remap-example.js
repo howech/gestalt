@@ -7,7 +7,7 @@ function mapper(old) {
     // map names that start with "f" to
     // new:<old_name>
     if( old.match(/^f/ )) {
-	return "new:" + old;	
+	return "new:" + old + ':0';	
     } else {
 	// ignore everything else
 	return undefined;
@@ -22,5 +22,7 @@ c.set("gak",4);
 
 var r = new RemapConfig( { mapper: mapper, original: c } );
 
-console.log( r.get('new:foo') );
+console.log( r.get('new:foo:0') );
 // prints out "1"
+
+console.log( r.toObject() );
