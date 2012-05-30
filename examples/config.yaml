@@ -1,9 +1,23 @@
+zookeeper:
+   host: "zk://localhost:2191"
+   path: "/chh/test"
+
 new:
-   foo: 1
-   bar: 2
-   baz: 3
+   foo:      1
+   bar:      2
+   baz:      3
+   somthing: wicked this way comes
+   double:   double, toil and trouble
+   colon:    "this string: it has a colon"
+
 more:
    x: a
    y: b
    z: Longer line of stuff.
 
+names:
+   - Alpha
+   - Bravo
+   - Charlie
+   - Delta
+   - Foxtrot
