@@ -1,9 +1,12 @@
 {
   "name": "gestalt",
-  "version": "0.0.4-2",
+  "version": "0.0.4-4",
   "author": "Chris Howe <chris@howeville.com>",
   "description": "Event driven configuration management.",
   "main": "./lib/gestalt",
+  "scripts": {
+    "test": "node ./vows/gestalt_vows.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/howech/gestalt.git"
