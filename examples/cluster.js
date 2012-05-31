@@ -172,7 +172,9 @@ function join_cluster() {
 	source: config_url, 
 	create_paths: true,
 	format: 'raw'
-    }).on('invalid', function(err){ throw new Error(err) });
+    }).on('invalid', function(err) { 
+	console.log(err) ;
+    });
     
     zookeeper.set( "zk", zk_config );
  
