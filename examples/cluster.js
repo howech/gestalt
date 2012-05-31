@@ -26,11 +26,21 @@ var argsMap = new gestalt.RemapConfig( {
     },
     original: new gestalt.ConfigArgs( {
 	optimist_options: {
-	    z: { alias: 'zookeeper' },
-	    c: { alias: 'config' },
-	    e: { alias: 'election' },
-	    n: { alias: 'names' },
-	    C: { alias: 'cluster' }
+	    z: { alias:    'zookeeper',
+		 describe: 'Zookeeper connect string (zk://host1:2181,host2:2182)'
+	       },
+	    c: { alias:    'config',
+		 describe: 'Configuration file'
+	       },
+	    C: { alias:    'cluster',
+		 describe: 'Name of the cluster to join.'
+	       },
+	    e: { alias:    'election',
+		 describe: 'Zookeeper node under the cluster node to use for negotiation of the cluster leader.'
+	       },
+	    n: { alias: 'names',
+		 describe: 'Zookeeper node under the cluster node to use for negotiation of node names.'
+	       }
 	}
     })
 });
@@ -197,6 +207,7 @@ function zk_choose_name(zk,dir,names,cb) {
     });
 }    
 
+// Start negotiations for a name
 function zk_name_me(zk,dir,names,cb) {
     zk_ensure_path(zk, dir, function(err) {
 	if(err) {
@@ -206,7 +217,7 @@ function zk_name_me(zk,dir,names,cb) {
     });
 } 
 
-// Negotiate to become the leader
+// Watch the guy in front of us in line for the throne
 function zk_watch_leader(zk,dir,me,path,cb) {
     var lw = function(type, state, p){
 	if( type == ZooKeeper.ZOO_CHANGED_EVENT ) {
@@ -227,28 +238,33 @@ function zk_watch_leader(zk,dir,me,path,cb) {
     zk.aw_get( path, lw, function() {} ); 
 }
 
-function zk_election(zk, dir, me, cb) {
-    if(!cb) {
+// Try to become leader, or determine who is in line before us.
+function zk_election(zk, dir, me, become_leader) {
+    if(!become_leader) {
 	throw new Error("zk_election must have a callback");
     }
     zk.a_get_children(dir, false, function(rc,err,children) {
 	children.sort();
 	var last = null;
-        _.each(children, function(child) {
+        _.find(children, function(child) {
 	    if(child == me ) {
 		if( last ) {
-		    zk_watch_leader( zk, dir, me, dir + "/" + last,cb  );
+		    zk_watch_leader( zk, dir, me, dir + "/" + last, become_leader  );
 		} else {
-		    cb();
+		    // become leader
+		    become_leader();
 		}
+		return true;
 	    } else {
 		last = child;
+		return false;
 	    }
 	});
     });
 }
 
-function zk_cast_ballot(zk,dir,name,cb) {
+// Start negotating for leadership
+function zk_cast_ballot(zk,dir,name,become_leader) {
     zk_ensure_path(zk, dir, function(err) {
 	if(err) {
 	    throw err;
@@ -258,7 +274,7 @@ function zk_cast_ballot(zk,dir,name,cb) {
 		throw new Error("Unable to create ballot node");
  	    } else {
  		var me = path.match(/[^\/]+$/)[0];
- 		zk_election(zk,dir,me,cb);
+ 		zk_election(zk,dir,me,become_leader);
  	    }
 	});
     });
