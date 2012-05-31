@@ -16,7 +16,8 @@
       "underscore": "*",
       "js-yaml": "*",
       "iniparser": "*",
-      "zookeeper": "*"
+      "zookeeper": "*",
+      "optimist": "*"
   },
   "devDependencies": {
       "vows": "*"
