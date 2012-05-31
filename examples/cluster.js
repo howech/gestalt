@@ -116,26 +116,36 @@ function on_load_config_file() {
 }
 
 
+// This is the cluster that we are currently
+// a member of or trying to become a member of.
+var current_cluster;
+
 function join_cluster() {
     // This method currently gets triggered
-    // a few times prematurely. We must
-    // ensure that there is in fact a cluster name
-    // and some names to choose from before we
-    // really start to join.
-    //
-    // Seems to come from a but in the ConfigFile
-    // loaded evetn...
+    // a few time. We must ensure that there is in fact a cluster name
+    // and some names to choose from before we really start to join.
     var cluster_name = config.get("cluster:name");
     if( ! cluster_name ) {
 	//console.log("missing cluster name.");
 	// Maybe we will get one later...
 	return;
     }
+
     var names = config.get("names");
     if( !names ) {
 	//console.log("no names to choose from");
 	return;
     }
+
+    // If we are already trying to join this cluster, dont
+    // start over.
+    if( cluster_name == current_cluster ) {
+	return;
+    }
+
+    // Make it official - we are trying to join a new cluster.
+    current_cluster = cluster_name;
+    console.log("\nJoining cluster: %s", cluster_name);
 
     var zk_config = config.get("zk");
     if( zk_config ) {
@@ -144,7 +154,6 @@ function join_cluster() {
     }
     var zk_connect = config.get("zookeeper:options:connect");
 
-    console.log("\nJoining cluster: %s", cluster_name);
 
     var config_url = zk_connect + config_path();
 
