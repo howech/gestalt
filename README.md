@@ -191,3 +191,93 @@ objects.
 
 Remapped objects do pass on events, and can be used as overrides or
 defaults in a config container. 
+
+## API
+
+### Configuration
+
+A Configuration object is a container of name value pairs. The names 
+can include colon separated hierarchical namespaces. 
+
+#### constructor Configuration( options )
+
+Creates a configuration object. Options include
+
+##### source
+
+The default source for changes to this object. If no source is given 
+for a set operation on the Configuration, the default is used instead.
+Note that only the initial value of this option is important. If it 
+is changed with the options() method, it will not change the default
+source for an object.
+
+##### destructure_assignments
+
+By default, this option is on. When turned on, if you try to assign
+an object or an array to a name in the configuration, it will destructure
+the object into nested namespace structures.
+
+#### get(name)
+
+Returns the value assigned to `name`, or undefined if not
+present. Namespaces are separated by colons. If name is an array, it
+is treated the same as if it were a single string joined together by
+colons.
+
+#### getValSource(name)
+
+The same as get, only instead of the assigned value, it returns an object
+that contains a value and a source field. The value is the same as 
+the value one would expect from get. The source field contains the 
+source of the value.
+
+#### set(name, value, source)
+
+Sets the value of name. If no source is given, the default source for
+the Configuration is used. If the configuration object does not have a
+default source, then the source becomes a reference to the line number
+and file of the function calling set.
+
+#### update(name, value, source)
+
+For standard Configuration objects, update works the same as set. For
+ConfigContainers, update and set have different behaviors.
+
+#### has(name)
+
+Returns true if there is a value defined for the given name.
+
+
+#### keys()
+
+Returns an array containing all of the keys that have assigned values
+in the configuration.
+
+#### each( function( value, name, configuration ) ) 
+
+Iterates through the keys and values of the configuration, calling
+the supplied function once for each setting.
+
+#### remove(name)
+
+Deletes the name from the configuration.
+
+#### report
+
+Generates a detailed report of all of the names.
+
+#### toObject
+
+Builds a javascript object representing the current state of the
+Configuration. Namespaces are converted to nested objects. If a
+namespace has the appearance of an array in that its internal names
+are sequential numbers starting with 0, it will be converted into an
+array instead of a regular object.
+
+#### options( options )
+
+Returns the options object for the Configuration. If passed an object,
+it will use it to override the existing options. Note that changing
+the options of a Configuration does not change the options of existing
+nested namespace configurations, but it will affect any namespaces
+created after the change.
