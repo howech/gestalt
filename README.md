@@ -281,3 +281,13 @@ it will use it to override the existing options. Note that changing
 the options of a Configuration does not change the options of existing
 nested namespace configurations, but it will affect any namespaces
 created after the change.
+
+#### Events
+
+- change 
+
+- ready
+
+- invalid
+
+- delete
