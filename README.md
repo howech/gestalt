@@ -199,95 +199,122 @@ defaults in a config container.
 A Configuration object is a container of name value pairs. The names 
 can include colon separated hierarchical namespaces. 
 
-#### constructor Configuration( options )
+- constructor Configuration( options )
 
-Creates a configuration object. Options include
+ Creates a configuration object. Options include
 
-##### source
+ - source
 
-The default source for changes to this object. If no source is given 
-for a set operation on the Configuration, the default is used instead.
-Note that only the initial value of this option is important. If it 
-is changed with the options() method, it will not change the default
-source for an object.
+  The default source for changes to this object. If no source is given
+  for a set operation on the Configuration, the default is used
+  instead.  Note that only the initial value of this option is
+  important. If it is changed with the options() method, it will not
+  change the default source for an object.
 
-##### destructure_assignments
+ - destructure_assignments
 
-By default, this option is on. When turned on, if you try to assign
-an object or an array to a name in the configuration, it will destructure
-the object into nested namespace structures.
+  By default, this option is on. When turned on, if you try to assign
+  an object or an array to a name in the configuration, it will
+  destructure the object into nested namespace structures.
 
-#### get(name)
+- get(name)
 
-Returns the value assigned to `name`, or undefined if not
-present. Namespaces are separated by colons. If name is an array, it
-is treated the same as if it were a single string joined together by
-colons.
+ Returns the value assigned to `name`, or undefined if not
+ present. Namespaces are separated by colons. If name is an array, it
+ is treated the same as if it were a single string joined together by
+ colons.
 
-#### getValSource(name)
+- getValSource(name)
 
-The same as get, only instead of the assigned value, it returns an object
-that contains a value and a source field. The value is the same as 
-the value one would expect from get. The source field contains the 
-source of the value.
+ The same as get, only instead of the assigned value, it returns an
+ object that contains a value and a source field. The value is the
+ same as the value one would expect from get. The source field
+ contains the source of the value.
 
-#### set(name, value, source)
+- set(name, value, source)
 
-Sets the value of name. If no source is given, the default source for
-the Configuration is used. If the configuration object does not have a
-default source, then the source becomes a reference to the line number
-and file of the function calling set.
+ Sets the value of name. If no source is given, the default source for
+ the Configuration is used. If the configuration object does not have
+ a default source, then the source becomes a reference to the line
+ number and file of the function calling set.
 
-#### update(name, value, source)
+- update(name, value, source)
 
-For standard Configuration objects, update works the same as set. For
-ConfigContainers, update and set have different behaviors.
+ For standard Configuration objects, update works the same as set,
+ except that if no source is provided in the update call, the
+ configuration's default source is not used. For ConfigContainers,
+ update and set have different behaviors.
 
-#### has(name)
+- has(name)
 
-Returns true if there is a value defined for the given name.
+ Returns true if there is a value defined for the given name.
 
 
-#### keys()
+- keys()
 
-Returns an array containing all of the keys that have assigned values
-in the configuration.
+ Returns an array containing all of the keys that have assigned values
+ in the configuration.
 
-#### each( function( value, name, configuration ) ) 
+- each( function( value, name, configuration ) ) 
 
-Iterates through the keys and values of the configuration, calling
-the supplied function once for each setting.
+ Iterates through the keys and values of the configuration, calling
+ the supplied function once for each setting.
 
-#### remove(name)
+- remove(name)
 
-Deletes the name from the configuration.
+ Deletes the name from the configuration.
 
-#### report
+- report()
 
-Generates a detailed report of all of the names.
+ Generates a detailed report of all of the names.
 
-#### toObject
+- toObject()
 
-Builds a javascript object representing the current state of the
-Configuration. Namespaces are converted to nested objects. If a
-namespace has the appearance of an array in that its internal names
-are sequential numbers starting with 0, it will be converted into an
-array instead of a regular object.
+ Builds a javascript object representing the current state of the
+ Configuration. Namespaces are converted to nested objects. If a
+ namespace has the appearance of an array in that its internal names
+ are sequential numbers starting with 0, it will be converted into an
+ array instead of a regular object.
 
-#### options( options )
+- options( options )
 
-Returns the options object for the Configuration. If passed an object,
-it will use it to override the existing options. Note that changing
-the options of a Configuration does not change the options of existing
-nested namespace configurations, but it will affect any namespaces
-created after the change.
+ Returns the options object for the Configuration. If passed an
+ object, it will use it to override the existing options. Note that
+ changing the options of a Configuration does not change the options
+ of existing nested namespace configurations, but it will affect any
+ namespaces created after the change.
+
+- addPatternListener(pattern, callback ) 
+
+ Calls the callback whenever there is a change to the configuration that
+ matches the pattern. Pattern could be a string, or a regex, in which cases
+ match means that the name of the changed value either equals the string
+ or matches the regex respectively. Pattern could also be a function which
+ return a truthy value if the change matches its criteria.
 
 #### Events
 
 - change 
 
+ Change events are emitted whenever the Configuration object detects that something
+ has changed in the data. The handlers to these events are passed an object describing
+ the change:
+
+ ```javascript
+  change = { name: "a:b:c",        // name of the value that changed
+             value: 5,             // the new value
+             old_value: undefined, // old value
+             source: "X"};         // the source of the change or the last value (for deletions)
+ ```
+
 - ready
+
+ A ready event is emitted when the object becomes ready for use. For ConfigFile objects, this
+ means that the file has been loaded. For other objects, it might mean something different.
 
 - invalid
 
-- delete
+ An invalid event is fired when something goes wrong - for instance if there is a problem parsing
+ a configuration file. While a configuration is in an invalid state, you should not trust its
+ data until it becomes ready again.
+

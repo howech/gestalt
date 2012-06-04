@@ -297,7 +297,7 @@ vows.describe('gestalt configurtion objects').addBatch({
 	    config.on('change', function(change) { changes.main.push(change); } );
 	    var c1 = config.addPatternListener('a:b', function(change) { changes.string.push(change); } );
 	    var c2 = config.addPatternListener(/^a/, function(change) { changes.regex.push(change); } );
-	    var c3 = config.addPatternListener( function(name) { return name.length == 4; }, 
+	    var c3 = config.addPatternListener( function(change) { return change.name.length == 4; }, 
 						function(change) { changes.func.push(change); } );
 	    
 	    config.set( "a:b" , 4);  // string+reges
