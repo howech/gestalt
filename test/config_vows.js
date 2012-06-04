@@ -289,6 +289,38 @@ vows.describe('gestalt configurtion objects').addBatch({
 	    assert.deepEqual( topic.changes[0], { name: "a", value: { b: "c", d: 5, q: {r:3, s:4} }, old_value: undefined, source: "X" } );
 	    assert.deepEqual( topic.changes[1], { name: "b", value: [1,2,3,4,5], old_value: undefined, source: "X" } );
 	}
+    },
+    "Pattern Listeners": {
+	topic: function() {
+	    var config = new Configuration({source: 'Z'});
+	    var changes = { main: [], string: [], regex: [], func: [] };
+	    config.on('change', function(change) { changes.main.push(change); } );
+	    var c1 = config.addPatternListener('a:b', function(change) { changes.string.push(change); } );
+	    var c2 = config.addPatternListener(/^a/, function(change) { changes.regex.push(change); } );
+	    var c3 = config.addPatternListener( function(name) { return name.length == 4; }, 
+						function(change) { changes.func.push(change); } );
+	    
+	    config.set( "a:b" , 4);  // string+reges
+	    config.set( "a:zz", 5);  // regex+func
+	    config.set( "c", 6);     // none
+	    
+	    config.removePatternListener(c1);
+	    config.set( "a:b", 6); // regex only 
+	    return changes;
+	},
+	"main had 4 changes":  function(changes) { assert.equal( changes.main.length, 4 ); },
+	"string had 1 change": function(changes) { assert.equal( changes.string.length, 1 ); },
+	"regex had 3 changes": function(changes) { assert.equal( changes.regex.length, 3 ); },
+	"func had 1 change":   function(changes) { assert.equal( changes.func.length, 1 ); },
+	"string listener": function(changes) { 
+	    _.each( changes.string, function( change ) { assert.equal( "a:b", change.name ) } );
+	},
+	"regex listener": function(changes) {
+	    _.each( changes.regex, function( change ) { assert.ok( change.name.match(/^a/) ) } );
+	},
+	"func listener": function(changes) {
+	    _.each( changes.func, function( change ) { assert.equal( change.name.length, 4 ) } );
+	}
     }
 }).export(module);
 
