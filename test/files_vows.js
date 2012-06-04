@@ -10,10 +10,8 @@ var gestalt         = require('../lib/gestalt'),
     ConfigFile      = gestalt.ConfigFile,
     RemapConfig     = gestalt.RemapConfig;
 
-exports.configuration = vows.describe('gestalt configurtion objects');
 
-
-exports.configuration.addBatch( {
+vows.describe( "Gestalt Configuration File Object").addBatch( {
     'config file object': {
         "json file": {
             topic: function() {
@@ -65,7 +63,4 @@ exports.configuration.addBatch( {
             }        
         } //,
     }
-});
-
-
-exports.configuration.run();
+}).export(module);

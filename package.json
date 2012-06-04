@@ -5,7 +5,7 @@
   "description": "Event driven configuration management.",
   "main": "./lib/gestalt",
   "scripts": {
-    "test": "node ./vows/gestalt_vows.js"
+    "test": "vows test/*.js"
   },
   "repository": {
     "type": "git",
