@@ -290,6 +290,6 @@ vows.describe('gestalt configurtion objects').addBatch({
 	    assert.deepEqual( topic.changes[1], { name: "b", value: [1,2,3,4,5], old_value: undefined, source: "X" } );
 	}
     }
-}).run();
+}).export(module);
 
 

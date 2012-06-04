@@ -10,9 +10,8 @@ var gestalt         = require('../lib/gestalt'),
     ConfigFile      = gestalt.ConfigFile,
     RemapConfig     = gestalt.RemapConfig;
 
-exports.configuration = vows.describe('gestalt configurtion objects');
 
-exports.configuration.addBatch( {
+vows.describe("Gestalt Configuration Container Object").addBatch( {
     'config container object': {
             topic: new ConfigContainer({source: "config container basics"}),
             'should be an object':          function(config) { assert.instanceOf(config,ConfigContainer); },
@@ -256,7 +255,6 @@ exports.configuration.addBatch( {
             }
         }                                        
     }
-});
+}).export(module);
 
 
-exports.configuration.run();
