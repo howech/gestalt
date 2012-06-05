@@ -9,7 +9,7 @@ cf.on('invalid', function(err,source) {
     console.log(err);
 });
 
-cf.on('loaded', function() {
+cf.on('ready', function() {
     console.log( cf.get('new:foo') );
     cf.report();
 });

@@ -16,8 +16,8 @@ zkc.patternListen( /^children:leader:data$/, function( change ) {
     console.log("change %j",change);
 });
 
-zkc.on('loaded', function(a,b) {
-    console.log("loaded");
+zkc.on('ready', function(a,b) {
+    console.log("ready");
 });
 
 zkc.on('invalid', function(a,b) {

@@ -114,7 +114,7 @@ var file = new gestalt.ConfigFile( { source: require.resolve( config.get( 'confi
 				   } );
 
 
-file.on('loaded', on_load_config_file );
+file.on('ready', on_load_config_file );
 file.on('invalid', function(err, source) {
     console.log(err,source);
 });
