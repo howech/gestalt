@@ -217,6 +217,12 @@ can include colon separated hierarchical namespaces.
   an object or an array to a name in the configuration, it will
   destructure the object into nested namespace structures.
 
+ - initial_state
+
+  State to transition to after initialization. Defaults to 'ready' for
+  many configuration objects. Defaults to 'not_ready' for files,
+  zookeeper, and other objects that load asynchonously.
+
 - get(name)
 
  Returns the value assigned to `name`, or undefined if not
