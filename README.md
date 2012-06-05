@@ -309,8 +309,13 @@ can include colon separated hierarchical namespaces.
 
 - ready
 
- A ready event is emitted when the object becomes ready for use. For ConfigFile objects, this
- means that the file has been loaded. For other objects, it might mean something different.
+ A ready event is emitted when the object becomes ready for use. For
+ ConfigFile objects, this means that the file has been loaded. For
+ other objects, it might mean something different. By default, a
+ configuration object will emit a 'ready' event in the next tick after
+ it was initialized.  This behavior can be changed by setting the
+ 'initial_state' option to 'not ready' and then changing the state to 
+ 'ready' through some other means (e.g. upon successfully loading a file).
 
 - invalid
 
