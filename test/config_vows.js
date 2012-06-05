@@ -130,7 +130,7 @@ vows.describe('gestalt configurtion objects').addBatch({
             var keys = config.keys();
             var each_keys = [];
             
-            config.each( function(element, key, cfg) {
+            config.each( function(element, key, source, cfg) {
                 each_keys.push(key);
                 assert.equal( element, cfg.get(key) );
             });
