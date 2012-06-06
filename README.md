@@ -11,16 +11,18 @@ There are a couple of motivations for gestalt. Configuration of a
 large software system is often complicated - there are of course many
 tools out there for gathering configuration information from a bunch
 of different sources. nconf for node is a good one, and gestalt is to
-some extent based upon it. There are a couple of things that many of
-these tools do not do. First, configuration files (and other sources)
-can change, and it would be nice to be able to react to these changes
-on-the-fly. Second, when you have a sufficiently complicated system of
-default and override configuration sources, it can become difficult to
-figure out exactly where a particular setting came from. Gestalt
-solves both of these problems. It has a per-value event change
-tracking system so that you can track changes to individual settings
-to your configuration. It also rigorously keeps track of where the 
-values for particular settings came from.
+some extent based upon it, ( but also influenced by configliere for
+ruby and the configuration node structure of chef). There are a couple
+of things that many of these tools do not do. First, configuration
+files (and other sources) can change, and it would be nice to be able
+to react to these changes on-the-fly. Second, when you have a
+sufficiently complicated system of default and override configuration
+sources, it can become difficult to figure out exactly where a
+particular setting came from. Gestalt solves both of these
+problems. It has a per-value event change tracking system so that you
+can track changes to individual settings to your configuration. It
+also rigorously keeps track of where the values for particular
+settings came from.
 
 ## Basics
 
