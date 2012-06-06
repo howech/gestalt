@@ -9,8 +9,6 @@ var envMap = new gestalt.RemapConfig( {
     mapper: {
 	"CENTRAL_CONFIG":   "config:file",
 	"CENTRAL_ZOOKEEPER":"zookeeper:options:connect",
-	"CENTRAL_ELECTION": "zookeeper:election",
-	"CENTRAL_NAME":     "zookeeper:names",
 	"CENTRAL_CLUSTER":  "cluster:name"
     },
     original: new gestalt.ConfigEnv()
@@ -20,8 +18,6 @@ var argsMap = new gestalt.RemapConfig({
     mapper: {
 	"config":    "config:file",
 	"zookeeper": "zookeeper:options:connect",
-	"election" : "zookeeper:election",
-	"names":     "zookeeper:names",
 	"cluster":   "cluster:name",
 	"help":      "help"
     },
@@ -36,12 +32,6 @@ var argsMap = new gestalt.RemapConfig({
 	       },
 	    C: { alias:    'cluster',
 		 describe: 'Name of the cluster to join.'
-	       },
-	    e: { alias:    'election',
-		 describe: 'Zookeeper node under the cluster node to use for negotiation of the cluster leader.'
-	       },
-	    n: { alias: 'names',
-		 describe: 'Zookeeper node under the cluster node to use for negotiation of node names.'
 	       },
 	    h: { alias: 'help',
 		 describe: 'Show (this) help message.'
@@ -77,29 +67,27 @@ config.addPatternListener("zk:children:leader:data", function(change) {
 });
 
 function election_path() {
-    return "/" + config.get("cluster:name" ) + config.get("zookeeper:election" );
+    return "/" + config.get("cluster:name" ) + "/election";
 }
 
 function config_path() {
-    return "/" + config.get("cluster:name" ) + config.get("zookeeper:config" );
+    return "/" + config.get("cluster:name" ) + "/config";
 }
 
 function names_path() {
-    return "/" + config.get("cluster:name" ) + config.get("zookeeper:names" );
+    return "/" + config.get("cluster:name" ) + "/names";
 }
-
 
 // Our name in the cluster is stored at cluster:me
 config.addPatternListener("cluster:me", function(change) {
     if(change.value) {
 	var name = change.value;
 	console.log( "I am", name );
-	var zk_config = config.get("zk");
+
 	// having a name set should indicate that
 	// we have a valid zk_config
-	if( !zk_config ) {
-	    throw new Error("Expected a zk_config");
-	}
+	var zk_config = config.get("zk");
+	if( !zk_config ) { throw new Error("Expected a zk_config"); }
 
 	zk_config.zookeeper( function(zk) {
 	    zk_cast_ballot(zk,election_path(), name, function() {
@@ -107,14 +95,13 @@ config.addPatternListener("cluster:me", function(change) {
 		console.log("I am leader");		
 		zk.a_create( config_path() + "/leader", config.get("cluster:me"), 1, function(rc,err,path) {
 		    if(rc) {
-			throw new Error("Error becoming leader" + err);
+			throw new Error("Error becoming leader:" + err);
 		    }
 		});
 	    });
 	});	
     }
 });
-
 
 
 //console.log( require.resolve( config.get('config:file')));
@@ -126,15 +113,11 @@ var file = new gestalt.ConfigFile( { source: require.resolve( config.get( 'confi
 
 
 file.on('ready', on_load_config_file );
-file.on('invalid', function(err, source) {
-    console.log(err,source);
-});
+file.on('invalid', function(err, source) { console.log(err,source); });
+
 config.addDefault( file );
 
-
-function on_load_config_file() {
-    join_cluster();
-}
+function on_load_config_file() { join_cluster(); }
 
 
 // This is the cluster that we are currently
@@ -146,15 +129,14 @@ function join_cluster() {
     // a few time. We must ensure that there is in fact a cluster name
     // and some names to choose from before we really start to join.
     var cluster_name = config.get("cluster:name");
+
     if( ! cluster_name ) {
-	//console.log("missing cluster name.");
 	// Maybe we will get one later...
 	return;
     }
 
     var names = config.get("names");
     if( !names ) {
-	//console.log("no names to choose from");
 	return;
     }
 
@@ -175,7 +157,6 @@ function join_cluster() {
     }
     var zk_connect = config.get("zookeeper:options:connect");
 
-
     var config_url = zk_connect + config_path();
 
     // set up zk_config object
@@ -183,14 +164,11 @@ function join_cluster() {
 	source: config_url, 
 	create_paths: true,
 	format: 'raw'
-    }).on('invalid', function(err) { 
-	console.log(err) ;
-    });
+    }).on('invalid', function(err) { console.log(err); });
     
     zookeeper.set( "zk", zk_config );
  
     // Negotiate a name
-
     zk_config.zookeeper( function(zk) { 
 	zk_name_me(zk, names_path(), names, function(name) {
 	    config.set("cluster:me",name);
@@ -293,6 +271,8 @@ function zk_cast_ballot(zk,dir,name,become_leader) {
     });
 }
 
+// Create paths as needed to ensure that the complete path exists
+// Created node will have empty data
 function zk_ensure_path(zk, path, cb ) {
     var segments = path.split('/');
     segments.shift();
@@ -311,6 +291,9 @@ function zk_ensure_path(zk, path, cb ) {
     };
     next();
 }
+
+
+
 // CTRL-C twice quickly to exit
 //        once to dump a status report
 

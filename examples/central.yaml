@@ -3,9 +3,6 @@ cluster:
 zookeeper: 
    options: 
      connect: "zk://localhost:2191"
-   election: /election
-   names: /names
-   config: /config
 names:
    - Alpha
    - Bravo
