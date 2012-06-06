@@ -290,6 +290,24 @@ vows.describe('gestalt configurtion objects').addBatch({
 	    assert.deepEqual( topic.changes[1], { name: "b", value: [1,2,3,4,5], old_value: undefined, source: "X" } );
 	}
     },
+    "destructure_arrays false": {
+	topic: function() {
+	    var config = new Configuration( {source:"X", destructure_arrays: false } );
+	    var changes = [];
+
+	    config.on('change', function(change) {changes.push( change ) } );
+	    config.set("a", [1,2,3,4,5] );
+
+	    return { config: config, changes: changes };
+	},
+	"values come back as they were set": function( topic ) {
+	    assert.deepEqual( topic.config.get("a"), [1,2,3,4,5] );
+	},
+	"changes behave as normal": function(topic) {
+	    assert.deepEqual( topic.changes[0], { name: "a", value: [1,2,3,4,5], old_value: undefined, source: "X" } );
+	}
+    },
+
     "Pattern Listeners": {
 	topic: function() {
 	    var config = new Configuration({source: 'Z'});

@@ -9,10 +9,10 @@ var gestalt         = require('../lib/gestalt'),
     ConfigArgs      = gestalt.ConfigArgs;
 
 vows.describe( "Gestalt Configuration Arguments Object").addBatch( {
-    'config file object': {
+    'config arguments object': {
         "args": {
             topic: function() {
-		return new ConfigArgs( {argv: ["program","--foo","bar"]});
+		return new ConfigArgs( {argv: ["--foo","bar"]});
             },
             'foo': function(config) {
                 assert.equal( config.get("foo"), "bar" );

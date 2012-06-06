@@ -13,18 +13,20 @@ var envMap = new gestalt.RemapConfig( {
 	"CENTRAL_NAME":     "zookeeper:names",
 	"CENTRAL_CLUSTER":  "cluster:name"
     },
-    original: new gestalt.ConfigEnv() 
+    original: new gestalt.ConfigEnv()
 });
 
-var argsMap = new gestalt.RemapConfig( {					  
+var argsMap = new gestalt.RemapConfig({
     mapper: {
 	"config":    "config:file",
 	"zookeeper": "zookeeper:options:connect",
 	"election" : "zookeeper:election",
 	"names":     "zookeeper:names",
-	"cluster":   "cluster:name"
+	"cluster":   "cluster:name",
+	"help":      "help"
     },
     original: new gestalt.ConfigArgs( {
+        optimist_usage: "Usage: $0 options\nStart a test cluster talking to zookeeper to coordinate naming and leader election.",
 	optimist_options: {
 	    z: { alias:    'zookeeper',
 		 describe: 'Zookeeper connect string (zk://host1:2181,host2:2182)'
@@ -40,6 +42,9 @@ var argsMap = new gestalt.RemapConfig( {
 	       },
 	    n: { alias: 'names',
 		 describe: 'Zookeeper node under the cluster node to use for negotiation of node names.'
+	       },
+	    h: { alias: 'help',
+		 describe: 'Show (this) help message.'
 	       }
 	}
     })
@@ -51,6 +56,11 @@ var zookeeper = new gestalt.Configuration(); // Placeholder for zookeeper config
 config.addDefault( zookeeper );
 config.addOverride( envMap );
 config.addOverride( argsMap );
+
+if( config.get("help") ) {
+    console.log( argsMap.original().help() );;
+    process.exit(0);
+}
 
 config.patternListen(/^cluster:name$/, function(change) {
     if(change.value) {
@@ -288,7 +298,7 @@ function zk_ensure_path(zk, path, cb ) {
     p = "";
     var next = function(rc,err,pth) {
 	if( rc && rc != ZooKeeper.ZNODEEXISTS ) {
-	    cb( new Error("Unable to create node: " + path ) );
+	    cb( new Error("Unable to create node: " + path + " :" +err ) );
 	} else {
 	    if( segments.length > 0 ) {
 		p = p + "/" + segments.shift();
