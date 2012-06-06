@@ -12,7 +12,7 @@ zkc.on('change', function(obj) {
 //    }
 });
 
-zkc.patternListen( /^children:leader:data$/, function( change ) {
+zkc.addPatternListener( "children:leader:data", function( change ) {
     console.log("change %j",change);
 });
 
