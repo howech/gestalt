@@ -62,13 +62,13 @@ if( config.get("help") ) {
     process.exit(0);
 }
 
-config.patternListen(/^cluster:name$/, function(change) {
+config.addPatternListener("cluster:name", function(change) {
     if(change.value) {
 	join_cluster();
     }
 });    
 
-config.patternListen(/^zk:children:leader:data$/, function(change) {
+config.addPatternListener("zk:children:leader:data", function(change) {
     if( change.value ) {
 	console.log( change.value, "is now leader.");
     } else {
@@ -90,7 +90,7 @@ function names_path() {
 
 
 // Our name in the cluster is stored at cluster:me
-config.patternListen(/^cluster:me$/, function(change) {
+config.addPatternListener("cluster:me", function(change) {
     if(change.value) {
 	var name = change.value;
 	console.log( "I am", name );
@@ -120,7 +120,8 @@ config.patternListen(/^cluster:me$/, function(change) {
 //console.log( require.resolve( config.get('config:file')));
 var file = new gestalt.ConfigFile( { source: require.resolve( config.get( 'config:file' ) ),
 				     watch: true,
-				     format: 'yaml'
+				     format: 'yaml',
+				     destructure_arrays: false
 				   } );
 
 
@@ -191,7 +192,7 @@ function join_cluster() {
     // Negotiate a name
 
     zk_config.zookeeper( function(zk) { 
-	zk_name_me(zk, names_path(), names.toObject(), function(name) {
+	zk_name_me(zk, names_path(), names, function(name) {
 	    config.set("cluster:me",name);
 	}); 
     });
