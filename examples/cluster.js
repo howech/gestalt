@@ -100,6 +100,9 @@ config.addPatternListener("cluster:me", function(change) {
 		});
 	    });
 	});	
+    } else {
+	console.log( "I was", change.old_value );
+	console.log("Now I have no name.");
     }
 });
 
@@ -149,6 +152,7 @@ function join_cluster() {
     // Make it official - we are trying to join a new cluster.
     current_cluster = cluster_name;
     console.log("\nJoining cluster: %s", cluster_name);
+    config.remove("cluster:me");
 
     var zk_config = config.get("zk");
     if( zk_config ) {
@@ -170,8 +174,13 @@ function join_cluster() {
  
     // Negotiate a name
     zk_config.zookeeper( function(zk) { 
-	zk_name_me(zk, names_path(), names, function(name) {
-	    config.set("cluster:me",name);
+	zk_name_me(zk, names_path(), names, function(name,err) {
+	    if( name ) {
+		config.set("cluster:me",name);
+	    } else {
+		console.log("Failed to join cluster.\n",err);
+		process.exit(-1);
+	    }
 	}); 
     });
 }
@@ -182,9 +191,9 @@ function join_cluster() {
 // Negotiate a unique name
 function zk_choose_name(zk,dir,names,cb) {
     zk.a_get_children(dir,false,function(rc,err,children) {
-	var n1 = _.without(names,children);
+	var n1 = _.difference(names,children);
 	if( n1.length == 0) {
-	    throw new Error("unable to get a name");
+	    cb( null, "Unable to get a name.");
 	} else {
 	    var name = n1[ Math.floor( Math.random() * n1.length ) ];
 	    zk.a_create( dir+"/"+name, "", 1, function(rc,err,stat,path) {
@@ -298,7 +307,14 @@ function zk_ensure_path(zk, path, cb ) {
 //        once to dump a status report
 
 var setup_exit = function() {
-    f = function() { process.exit(); }
+    f = function() { 
+	// Try to gracefully close our zookeeper connection
+	var zk_config = config.get("zk");
+	if( zk_config ) {
+	    zk_config.zookeeper( function(zk) { zk.close(); } );
+	}
+	process.exit(); 
+    };
     process.removeAllListeners('SIGINT');
     process.on('SIGINT', f );
     setTimeout( function() { 
