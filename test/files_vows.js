@@ -18,8 +18,13 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
                 var promise = new EventEmitter();
                 var config_json = require.resolve('./files/config.json');
                 var config = new ConfigFile( {source: config_json, format: 'json'} );
-                config.on('invalid', function() { promise.emit('failure', config); });
-                config.on('ready',  function() { promise.emit('success', config); });
+		config.on('state', function(state_change) {
+		    if( state_change.state == 'invalid' ) {
+			promise.emit('failure', config);
+		    } else if ( state_change.state == 'ready' ) {
+			promise.emit('success', config);
+		    }
+		});
                 return promise;
             },
             'loads properly': function(config) {
@@ -33,8 +38,13 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
                 var promise = new EventEmitter();
                 var config_yaml = require.resolve('./files/config.yaml');
                 var config = new ConfigFile( {source: config_yaml, format: 'yaml'} );
-                config.on('invalid', function() { promise.emit('failure', config); });
-                config.on('ready',  function() { promise.emit('success', config); });
+		config.on('state', function(state_change) {
+		    if( state_change.state == 'invalid' ) {
+			promise.emit('failure', config);
+		    } else if ( state_change.state == 'ready' ) {
+			promise.emit('success', config);
+		    }
+		});
                 return promise;
             },
             'loads properly': function(config) {
@@ -50,8 +60,14 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
                 var promise = new EventEmitter();
                 var config_ini = require.resolve('./files/config.ini');
                 var config = new ConfigFile( { source: config_ini, format: 'ini'} );
-                config.on('invalid', function() { promise.emit('failure', config); });
-                config.on('ready',  function() { promise.emit('success', config); });
+		config.on('state', function(state_change) {
+		    if( state_change.state == 'invalid' ) {
+			promise.emit('failure', config);
+		    } else if ( state_change.state == 'ready' ) {
+			promise.emit('success', config);
+		    }
+		});
+
                 //config.emit('loaded');
                 return promise;
             },

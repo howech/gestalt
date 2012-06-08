@@ -115,8 +115,13 @@ var file = new gestalt.ConfigFile( { source: require.resolve( config.get( 'confi
 				   } );
 
 
-file.on('ready', on_load_config_file );
-file.on('invalid', function(err, source) { console.log(err,source); });
+file.on('state', function( state_change ) {
+    if( state_change.state == 'invalid' ) {
+	console.log( 'file invalid: ', state_change.data );
+    } else if ( state_change.state == 'ready' ) {
+	on_load_config_file( state_change );
+    }
+});
 
 config.addDefault( file );
 

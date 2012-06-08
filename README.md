@@ -96,6 +96,54 @@ You can also listen to events on the nested configuration objects. Note
 that configuration names in the events are reported relative to the configuration
 object you are listening to. 
 
+Configuration objects also have a ready/invalid/other state. When
+everything about the configuration is loaded the way it expects that
+it should be, it enters a 'ready' state.  If something has gone wrong
+in a way that might require some attention, it enters an 'invalid'
+state. Other states are possible - most configuration objects start in
+a 'not ready' state, but particular implementations might add some other
+special states. 
+
+State propagates from children to parents and from contained objects
+to containers.  The parent/container will become invalid if any of its
+children/contents become 'invalid'. Also, a parent/container will only become
+'ready' if all of its children/contents are 'ready'. If no sub-configuration
+is invalid, but not all of them are ready, parents and containers become
+'not ready'. 
+
+On state transitions (and whenever further 'invalid' states are
+encountered) configuration objects will emit a 'state' message. The
+payload object is of the form:
+
+```javascript
+{ state: 'ready',
+  old_state: 'not ready',
+  data: 'arbitrary data that might help explain the transition'
+}
+```
+
+To reiterate, there are three main states a Configuration object can
+be in:
+
+- 'ready' This means that there were no problems getting to the
+   configuration data. You can read data from it, and set up
+   listeners.
+
+- 'invalid' Something has gone wrong. We may not be able to get in
+  contact with the data source, or there may have been a problem
+  parsing the data. In any case, the data contained in the
+  configuration object may be corrupt, out of date, or wrong. When a
+  configuration object goes into an 'invalid' state, the program should
+  stop consuming configuration data from the object and seek a way to remedy
+  the invalid state.
+
+- 'not ready', (and others). The configuration object is not ready for reads.
+  It will send out another 'state' event when it is ready or when something
+  actually goes wrong. 'not ready' states are not an error state, but while
+  a configuration is in a 'not ready' state, you may not be able to rely on
+  the contents to be accurate, up to date, or even present.
+
+
 ## Containers
 
 The ConfigContainer class gives you a way to set up a system of
