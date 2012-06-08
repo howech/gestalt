@@ -231,13 +231,16 @@ console.log( r.get('new:foo') );
 
 ```
 
+The mapper can be a function as above, or it can be a simple
+java object with old values as keys and new values as corresponding
+values. Keys not present in the object will be mapped out of the
+RemapConfig.
+
 Not surprisingly, there are a couple of restrictions on this type of
-configuration object. First, it is read only. Second, the remapper
+configuration object. First, it is read only. Second, the mapper
 function can show that it ignores part of the object space by
 returning undefined for some values. For the rest of the values, it
 must make sure to return unique new names for different old names.
-Third, the toObject function does not try to detect array-like
-objects.
 
 Remapped objects do pass on events, and can be used as overrides or
 defaults in a config container. 
@@ -267,11 +270,30 @@ can include colon separated hierarchical namespaces.
   an object or an array to a name in the configuration, it will
   destructure the object into nested namespace structures.
 
+ - desctructure_arrays
+
+  This option is similar to destructure_assignments, only it only controls
+  whether or not to destructure array objects. It is true by default - when changed
+  to false, arrays will be valid configuration values.
+
+  Note, if you turn off destructure_arrays or destructure_assignments, the configuration
+  object will not react to internal changes in the structured values. In particular;
+
+```javascript
+
+  config.set("a",[1,2,3]); // emits a change
+  congig.get("a")[0] = 7   // !!! does not emit a change !!!
+
+```
+
  - initial_state
 
   State to transition to after initialization. Defaults to 'ready' for
-  many configuration objects. Defaults to 'not_ready' for files,
-  zookeeper, and other objects that load asynchonously.
+  many configuration objects. Defaults to 'not ready' for files,
+  zookeeper, and other objects that load asynchonously. Note that the
+  configuration object is created in a 'not ready' state, and the
+  transizion to its initial_state actually happens in the next tick after
+  creation.
 
 - get(name)
 
@@ -304,7 +326,6 @@ can include colon separated hierarchical namespaces.
 - has(name)
 
  Returns true if there is a value defined for the given name.
-
 
 - keys()
 
@@ -348,6 +369,19 @@ can include colon separated hierarchical namespaces.
  or matches the regex respectively. Pattern could also be a function which
  return a truthy value if the change matches its criteria.
 
+- removePatternListener( callback )
+
+Removes a previously added listener callback.
+
+- state( state, data )
+
+If no arguments are given, it returns the current state of the object.
+If a state it given, it transitions the configuration to that
+state. If the object's state has actually changed (or if we get
+another 'invalid' when it was already in an invalid state) it will
+emit a 'state' event, passing the data argument on in the state change
+payload along with the new and old states.
+
 #### Events
 
 - change 
@@ -363,19 +397,9 @@ can include colon separated hierarchical namespaces.
              source: "X"};         // the source of the change or the last value (for deletions)
  ```
 
-- ready
+- state
 
- A ready event is emitted when the object becomes ready for use. For
- ConfigFile objects, this means that the file has been loaded. For
- other objects, it might mean something different. By default, a
- configuration object will emit a 'ready' event in the next tick after
- it was initialized.  This behavior can be changed by setting the
- 'initial_state' option to 'not ready' and then changing the state to 
- 'ready' through some other means (e.g. upon successfully loading a file).
+When the object's state changes between 'invalid', 'ready' and 'not ready', it will 
+emit 'change' events.
 
-- invalid
-
- An invalid event is fired when something goes wrong - for instance if there is a problem parsing
- a configuration file. While a configuration is in an invalid state, you should not trust its
- data until it becomes ready again.
 
