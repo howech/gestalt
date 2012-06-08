@@ -1,6 +1,6 @@
 {
   "name": "gestalt",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Chris Howe <chris@howeville.com>",
   "description": "Event driven configuration management.",
   "main": "./lib/gestalt",
