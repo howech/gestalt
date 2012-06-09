@@ -2,7 +2,7 @@ cluster:
    name: default
 zookeeper: 
    options: 
-     connect: "zk://localhost:2191"
+     connect: "zk://localhost:2181"
 names:
    - Alpha
    - Bravo
