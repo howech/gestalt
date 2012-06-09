@@ -281,7 +281,36 @@ vows.describe("Gestalt Configuration Container Object").addBatch( {
 	    assert.deepEqual( _.pluck(states,'data'),
 			      ['test1','test2','test3','test4' ] );
 	}
+    },
+    "Initial State": {
+	topic: function() {
+	    var states = [];
+	    var orig = new ConfigContainer();
+	    orig.state('not ready');
+
+	    var config = new ConfigContainer({config: orig});
+	    states.push( config.state() );
+
+	    var def = new Configuration();
+	    def.state('invalid')
+	    
+	    var over = new Configuration();
+	    over.state('unknown');
+
+	    config.addDefault(def);
+	    states.push( config.state() );
+
+	    config.addOverride(over);
+	    states.push( config.state() );
+
+	    return states;
+	}, 
+	"states": function(states) {
+	    assert.deepEqual( states,
+			      ['ready','invalid','not ready'] );
+	}
     }
+
 
 }).export(module);
 
