@@ -107,7 +107,6 @@ config.addPatternListener("cluster:me", function(change) {
 });
 
 
-//console.log( require.resolve( config.get('config:file')));
 var file = new gestalt.ConfigFile( { source: require.resolve( config.get( 'config:file' ) ),
 				     watch: true,
 				     format: 'yaml',
