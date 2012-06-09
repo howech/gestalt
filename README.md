@@ -3,26 +3,27 @@
 Gestalt is a library for managing configuration information for
 node.js applications. The main premise of gestalt is that the
 underlying configuration for an application may change while the
-application is still running. Gestalt gives you a framework detecting
+application is still running. Gestalt provides a framework detecting
 and reacting to these changes without having to completely restart
 your application.
 
-There are a couple of motivations for gestalt. Configuration of a
+There are a couple of motivations for gestalt: Configuration of a
 large software system is often complicated - there are of course many
 tools out there for gathering configuration information from a bunch
 of different sources. nconf for node is a good one, and gestalt is to
-some extent based upon it, ( but also influenced by configliere for
-ruby and the configuration node structure of chef). There are a couple
-of things that many of these tools do not do. First, configuration
-files (and other sources) can change, and it would be nice to be able
-to react to these changes on-the-fly. Second, when you have a
+some extent based upon it. Gestalt is also influenced by configliere
+for ruby and the configuration node structure of chef. However, there
+are a couple of things that many of these tools do not do well. First,
+configuration files (and other sources) can change, and it would be
+nice to be able to react to these changes on-the-fly. Second, for a
 sufficiently complicated system of default and override configuration
 sources, it can become difficult to figure out exactly where a
-particular setting came from. Gestalt solves both of these
-problems. It has a per-value event change tracking system so that you
-can track changes to individual settings to your configuration. It
-also rigorously keeps track of where the values for particular
-settings came from.
+particular setting came from. 
+
+Gestalt solves both of these problems. It has a per-value event change
+tracking system so that you can track changes to individual settings
+to your configuration. It also rigorously keeps track of where the
+values for particular settings came from.
 
 ## Basics
 
@@ -58,7 +59,7 @@ var owner = ownerConfig.toObject();    // convert to a plain javascript object:
 ```
 
 Values can be primative values (numbers, strings, booleans,
-etc.). Assignments of structured objects get destructured into nested
+etc.). By default, assignments of structured objects get destructured into nested
 Configuration objects.
 
 ```javascript
@@ -68,11 +69,12 @@ var fred_phone = config.get( 'neighbor:phone' );
 
 ```
 
-In many cases (not quite all...this is not yet supported for
-RemapConfig objects...) it is possible to turn a configuration object
-back into a regular object. In fact, if a configuration object looks
-like an array (all integer keys...)  toObject will in fact return an
-array.
+( The default destructuring of assignments can be disabled. See 
+the destructure_assignments and destructure_arrays options, below. )
+
+It is possible to turn a configuration object back into a regular
+object. Also, if a configuration object looks like an array (all
+integer keys...)  toObject will in fact return an array.
 
 ## Events
 
@@ -92,9 +94,9 @@ config.set("owner:phone", "5554444", "phone book");
 
 ```
 
-You can also listen to events on the nested configuration objects. Note
-that configuration names in the events are reported relative to the configuration
-object you are listening to. 
+The nested configuration objects are also event emitters. Note that
+the configuration names in the events are reported relative to the
+configuration object being listening to.
 
 Configuration objects also have a ready/invalid/other state. When
 everything about the configuration is loaded the way it expects that
@@ -127,7 +129,8 @@ be in:
 
 - 'ready' This means that there were no problems getting to the
    configuration data. You can read data from it, and set up
-   listeners.
+   listeners. Note that a configuration can only be in a ready
+   state if all of its dependencies are also ready.
 
 - 'invalid' Something has gone wrong. We may not be able to get in
   contact with the data source, or there may have been a problem
@@ -135,7 +138,8 @@ be in:
   configuration object may be corrupt, out of date, or wrong. When a
   configuration object goes into an 'invalid' state, the program should
   stop consuming configuration data from the object and seek a way to remedy
-  the invalid state.
+  the invalid state. If any of an objects depencencies is in an invalid
+  state, the object will also be invalid.
 
 - 'not ready', (and others). The configuration object is not ready for reads.
   It will send out another 'state' event when it is ready or when something
