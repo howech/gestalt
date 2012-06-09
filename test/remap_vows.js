@@ -195,7 +195,32 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 		assert.deepEqual( obj, { a: {a:2}, b: {b:1} } );
 	    }
 	}
+    },
+    "State Change": {
+	topic: function() {
+	    var states = [];
+	    var config = new Configuration({source: "basic config object"});
+	    var mapper = function(old_name) {
+		return {a:'e:f', b:'e:g', c:'d'}[old_name];
+	    };
+	    var remap = new RemapConfig({mapper: mapper, original: config});
+	    remap.on('state', function(state) {states.push(state);} );
+	    config.state('invalid', 'test1');
+	    config.state('invalid', 'test2'); 
+	    config.state('weird', 'test3');
+	    config.state('weird', 'doesnt propagate');
+	    config.state('ready', 'test4');
+	    return states;
+	}, 
+	"4 state changes": function(states) {
+	    assert.equal( states.length, 4 );
+	    assert.deepEqual( _.pluck(states,'state'),
+			      ['invalid','invalid','weird','ready'] );
+	    assert.deepEqual( _.pluck(states,'data'),
+			      ['test1','test2','test3','test4' ] );
+	}
     }
+
 }).export(module);
 
 
