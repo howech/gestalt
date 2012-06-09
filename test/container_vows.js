@@ -254,7 +254,35 @@ vows.describe("Gestalt Configuration Container Object").addBatch( {
 		 ]); 
             }
         }                                        
+    },
+    "State Change": {
+	topic: function() {
+	    var states = [];
+	    var orig = new ConfigContainer();
+	    var config = new ConfigContainer({config: orig})
+	        .on('state', function(state) { states.push(state); } );
+	    var def = new Configuration();
+	    var over = new Configuration();
+	    config.addDefault(def);
+	    config.addOverride(over);
+
+	    def.state('invalid', 'test1'); 
+	    over.state('invalid', 'test2');
+	    orig.state('unknown', 'test3');
+	    orig.state('ready', 'doesnt propagate');
+	    def.state('ready', 'doesnt propagate');
+	    over.state('ready', 'test4');
+	    return states;
+	}, 
+	"4 state changes": function(states) {
+	    assert.equal( states.length, 4 );
+	    assert.deepEqual( _.pluck(states,'state'),
+			      ['invalid','invalid','not ready', 'ready'] );
+	    assert.deepEqual( _.pluck(states,'data'),
+			      ['test1','test2','test3','test4' ] );
+	}
     }
+
 }).export(module);
 
 
