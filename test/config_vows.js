@@ -339,6 +339,28 @@ vows.describe('gestalt configurtion objects').addBatch({
 	"func listener": function(changes) {
 	    _.each( changes.func, function( change ) { assert.equal( change.name.length, 4 ) } );
 	}
+    },
+    "State Change": {
+	topic: function() {
+	    var states = [];
+	    var config = new Configuration({source: "X"})
+	        .on('state', function(state) { states.push(state); } );
+	    config.set("a:b:c:d",1);
+	    config.set("a:b:d:e",1);
+	    config.get("a:b:c").state('invalid', 'test1'); 
+	    config.get("a:b:d").state('invalid', 'test2');
+	    config.get("a:b").state('unknown', 'test3');
+	    config.get("a:b:c").state('ready', 'doesnt propagate');
+	    config.get("a:b:d").state('ready', 'test4');
+	    return states;
+	}, 
+	"4 state changes": function(states) {
+	    console.log();
+	    assert.deepEqual( _.pluck(states,'state'),
+			      ['invalid','invalid','not ready', 'ready'] );
+	    assert.deepEqual( _.pluck(states,'data'),
+			      ['test1','test2','test3','test4' ] );
+	}
     }
 }).export(module);
 
