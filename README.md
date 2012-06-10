@@ -606,3 +606,76 @@ Boolean. If set to true, the constructed ConfigFile object will set up
 a watch for changes to the underlying file. If it changes on disk,
 ConfigFile will reload the file and update any changed values.
 
+### ZookeeperConfig
+
+ZooKeeper (http://zookeeper.apache.org/) is "a centralized service for
+maintaining configuration information, naming, providing distributed
+synchronization, and providing group services". The ZookeeperConfig
+object assists in integrating zookeeper services into an overall configuration
+package. 
+
+ZookeeperConfig does not really assist with writing information to zookeeper,
+only to reacting to information as it changes on the zookeeper servers. 
+
+Much like the ConfigFile object, the ZookeeperConfig object is just a standard
+Configuration object with a couple of extra options and methods.
+
+This configuration object relies on the 'zookeeper' npm package. This dependency 
+is not listed in the gestalt package dependencies, and is only required when
+a ZookeeperConfig object is first instantiated.
+
+Zookeeper has a slightly different idea about hierarchy from other
+configuration systems: in general every node can have both a value and
+children. ZookeeperConfig manages this by adding two sub-configuration
+objects to a configuration representing a a zookeeper node - one
+called 'data' and the other called 'children'. 'data' will contain
+whatever comes back from parsing the data in the zookeeper
+node. 'children' contains names corresponding to the relative names of the 
+zookeeper nodes children and values of more ZookeeperConfig objects
+corresponding to the zookeeper child nodes.
+
+- constructor ZookeeperConfig( options )
+
+The options are the same as for Configuration with the following additions:
+
+- source 
+
+The source should be a string of the form 'zk://host1:port1,host2:port2/path/to/config'.
+
+- format
+
+What format is the data stored in on zookeeper nodes. 'raw' means that
+the data for a given node will be placed in a javascript string object and
+stored under the name "data" for that node. Other options are 'json', 'ini',
+and 'yaml'. 
+
+- parser
+
+The same as for ConfigFile - you can provide your own parser.
+
+- zookeeper
+
+Use this option to hand off an existing zookeeper connection
+
+- zookeeper_options
+
+If the ZookeeperConfig object is to create its own zookeeper
+connection, these options will be passed to the constructor for
+ZooKeeper (from the npm package).
+
+- create_paths
+
+Boolean. If true, once connected to zookeeper, ZookeeperConfig will
+create the path of the zookeeper node it is trying to listen to, if 
+it is not already there.
+
+#### Methods
+
+- zookeeper( function(zk) )
+
+The callback will be called when a zookeeper connection becomes
+available, or immediately if it is already available. This method can
+be used to make zookeeper calls on the same connection that is being
+used by the ZookeeperConfig object.
+
+
