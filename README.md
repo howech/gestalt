@@ -541,3 +541,37 @@ additions and modifications:
  - remove()
 
  Does nothing - remap objects are read only at this time.
+
+### ConfigArgs
+
+This is a standard Configuration object that pulls its name and value
+pairs from parsing the command line arguments with the optimist
+library. In addition to the standard configuration options, it will also
+accept the following:
+
+ - argv
+
+ Use the array instead of the arguments in process.argv
+
+ - optimist_usage
+
+ String to pass on to optimist as a usage string. ( Uses optimist's
+ "usage" method. )
+
+ - optimist_options
+
+ Object to pass on to optimist as a configuration options. ( Uses
+ optimist's "usage" method. )
+
+
+### ConfigEnv
+
+This is a standard Configuration object that pulls its name and value
+pairs from parsing the environmental variables. In addition to the
+standard configuration options, it will also accept the following:
+
+
+ - env
+
+Use this set of name value pairs instead of process.env.
+
