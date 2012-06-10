@@ -584,7 +584,8 @@ accept the following:
  - format
 
 Tells what format the file is in. Current options are 'json', 'yaml'
-and 'ini'.
+and 'ini'. By default, the format will be 'auto', which will try to guess
+the format of the file based on its file extension.
 
  - source
 
