@@ -575,3 +575,24 @@ standard configuration options, it will also accept the following:
 
 Use this set of name value pairs instead of process.env.
 
+### ConfigFile
+
+This is a standard Configuration object that draws its names and values
+from a configuration file. In addition to the standard options, ConfigFiles
+accept the following:
+
+ - format
+
+Tells what format the file is in. Current options are 'json', 'yaml'
+and 'ini'.
+
+ - source
+
+Tells what file to read - gets passed to fs.readFile.
+
+ - watch
+
+Boolean. If set to true, the constructed ConfigFile object will set up
+a watch for changes to the underlying file. If it changes on disk,
+ConfigFile will reload the file and update any changed values.
+
