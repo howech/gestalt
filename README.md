@@ -587,6 +587,13 @@ Tells what format the file is in. Current options are 'json', 'yaml'
 and 'ini'. By default, the format will be 'auto', which will try to guess
 the format of the file based on its file extension.
 
+ - parser
+
+Normally, the format of the file determines what to use as a parser. This option
+can be used to override exactly how to turn the contents of a file into
+configuration. It should be a function that can accept the data from a file read
+and convert it into a raw javascript object. 
+
  - source
 
 Tells what file to read - gets passed to fs.readFile.
