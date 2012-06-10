@@ -585,7 +585,9 @@ accept the following:
 
 Tells what format the file is in. Current options are 'json', 'yaml'
 and 'ini'. By default, the format will be 'auto', which will try to guess
-the format of the file based on its file extension.
+the format of the file based on its file extension. If you specify 'raw'
+as a format, the contents of the file will be added as a string to the
+'contents' name of the configuration object.
 
  - parser
 
