@@ -34,16 +34,6 @@ vows.describe("Gestalt Configuration Container Object").addBatch( {
                     config.set(name, value2);                
                     assert.equal( config.get(name), value2 );
                 },
-            'should break apart colon separated paths':
-                function(config) {
-                    var path = config.getPath("a:b:c:d");
-                    assert.isArray( path );
-                    assert.equal(path.length, 4);
-                    assert.equal(path[0], "a");
-                    assert.equal(path[1], "b");
-                    assert.equal(path[2], "c");
-                    assert.equal(path[3], "d");
-                },
             'should populate new paths when set': 
                 function(config) {
                     var path = "a:long:path:name";

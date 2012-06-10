@@ -251,7 +251,7 @@ defaults in a config container.
 
 ## API
 
-### Configuration
+### Configuration 
 
 A Configuration object is a container of name value pairs. The names 
 can include colon separated hierarchical namespaces. 
@@ -299,9 +299,11 @@ can include colon separated hierarchical namespaces.
   transizion to its initial_state actually happens in the next tick after
   creation.
 
+#### Methods
+
 - get(name)
 
- Returns the value assigned to `name`, or undefined if not
+ Returns the value assigned to 'name', or undefined if not
  present. Namespaces are separated by colons. If name is an array, it
  is treated the same as if it were a single string joined together by
  colons.
@@ -345,9 +347,9 @@ can include colon separated hierarchical namespaces.
 
  Deletes the name from the configuration.
 
-- report()
+- report( )
 
- Generates a detailed report of all of the names.
+ Generates a detailed report (on console.log) of all of the names.
 
 - toObject()
 
@@ -355,7 +357,8 @@ can include colon separated hierarchical namespaces.
  Configuration. Namespaces are converted to nested objects. If a
  namespace has the appearance of an array in that its internal names
  are sequential numbers starting with 0, it will be converted into an
- array instead of a regular object.
+ array instead of a regular object. The resultant object will not
+ generate any events and will not have source attribution.
 
 - options( options )
 
@@ -367,11 +370,12 @@ can include colon separated hierarchical namespaces.
 
 - addPatternListener(pattern, callback ) 
 
- Calls the callback whenever there is a change to the configuration that
- matches the pattern. Pattern could be a string, or a regex, in which cases
- match means that the name of the changed value either equals the string
- or matches the regex respectively. Pattern could also be a function which
- return a truthy value if the change matches its criteria.
+ Calls the callback whenever there is a change to the configuration
+ that matches the pattern. Pattern could be a string, or a regex, in
+ which cases match means that the name of the changed value either
+ equals the string or matches the regex respectively. Pattern could
+ also be a function which return a truthy value if the change matches
+ its criteria.
 
 - removePatternListener( callback )
 
@@ -390,9 +394,9 @@ payload along with the new and old states.
 
 - change 
 
- Change events are emitted whenever the Configuration object detects that something
- has changed in the data. The handlers to these events are passed an object describing
- the change:
+ Change events are emitted whenever the Configuration object detects
+ that something has changed in the data. The handlers to these events
+ are passed an object describing the change:
 
  ```javascript
   change = { name: "a:b:c",        // name of the value that changed
@@ -403,7 +407,137 @@ payload along with the new and old states.
 
 - state
 
-When the object's state changes between 'invalid', 'ready' and 'not ready', it will 
-emit 'change' events.
+When the object's state changes between 'invalid', 'ready' and 'not
+ready', it will emit 'state' events of the form:
+
+```javascript
+ 
+  state = { state: 'ready',          // new state value
+            old_state: 'invalid',    // state we are transitioning to
+            data: 'good now'         // data passed in by the config.state() method.
+          };
+```
+
+### ConfigContainer
+
+gestalt's mechanism to deal with the notion of default and override
+behavior is implemented in the ConfigContainer object.  ConfigContainers
+contain a list or priority ordered configuration objects. Calling 'get(name)'
+on the ConfigContainer will return the value assigned to the highest priority
+configuration that has a value set for that name. 
+
+- constructor ConfigContainer( options )
+
+ Takes the same options as a Configuration object, but will also accept
+
+ -config
+  
+  A configuration object to act as the 'normal' object. See 'set' and
+  'update' below.  If no config option is given, a new object will be
+  created as the 'normal' object;
+
+#### Methods
+
+All of the public methods of the Configuration object should work on a
+ConfigContainer, however the semantics of a few of them are a little
+different.
+
+- get(name)
+
+ Returns the value associated with the name of the highest priority object
+ containing a defined value for the name. 
+
+- set(name, value, source)
+
+ Calls 'set' on the 'normal' priority configuration object.
+
+- update(name, value, source)
+
+ Calls 'update' on the highest prior configuration that has a value
+ already set for 'name'. If none have defined 'name', then call 'update'
+ on the 'normal' priority object.
+
+- keys()
+
+ Returns the union of all of the keys in all of the contained configuration
+ objects.
+
+- has(name)
+
+ Returns true if the name is in the result of calling keys()
+
+- each()
+
+ Works the same as Configuration's each method, but the values are as
+ determined by the highest priority configuration object that has a
+ value for the given key.
+
+- addOverride( config )
+
+ Adds a configuration object to the priority list of configurations
+ as the highest priority object.
+
+- addDefault( config )
+
+ Adds a configuration object to the priority list as the lowest
+ priority config object.
+
+### RemapConfig
+
+The RemapConfig object provides a way to change the names of a
+configuration without changing the values. This useful for changing
+the names that come from environment variables or command line
+variables into names that match up with the configuration hierarchy
+established in a configuraiton file - making it possible to use
+the override and default behaviors from a ConfigContainer object.
+
+- constructor RemapConfig( options )
+
+ Takes the same options as a Configuration object, but will also accept
+
+ -config (mandatory)
+
+ The configuration object to remap.
+
+ -mapper (mandatory)
+
+ Specifies how to remap configuration names. This can either be a
+ function of the form:
+
+```javascript
+
+remap = function(old_value) {
+    var new_value = "a:b:c:" + old_value;
+    return new_value;
+}
+
+```
+
+ or it can be a flat javascript object with old names as keys and new
+ names as values.
+
+ Names that get mapped to 'undefined' by a remap function, or that are
+ not present in the remap object, will simply not be included in the
+ resultant object.
+
+### Methods
+
+All of the Configuration public methods are supported, with the following
+additions and modifications:
 
 
+ - original()
+
+ Returns a reference to the unmapped configuration object.
+
+ - set()
+
+ Does nothing - remap objects are read only at this time.
+ 
+ - update()
+
+ Does nothing - remap objects are read only at this time.
+
+ - remove()
+
+ Does nothing - remap objects are read only at this time.

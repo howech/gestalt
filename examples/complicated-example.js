@@ -26,8 +26,8 @@ var e = new ConfigEnv();
 var a = new ConfigArgs();
 var yaml_file = require.resolve('./config.yaml');
 var f = new ConfigFile({ source: yaml_file, format: 'yaml'});
-var re = new RemapConfig( { mapper: env_mapper, original: e } );
-var ra = new RemapConfig( { mapper: args_mapper, original: a } );
+var re = new RemapConfig( { mapper: env_mapper, config: e } );
+var ra = new RemapConfig( { mapper: args_mapper, config: a } );
 
 var config = new ConfigContainer({ source: "config" });
 config.addOverride( re );

@@ -20,7 +20,7 @@ c.set("fab",2);
 c.set("far:blah",3);
 c.set("gak",4);
 
-var r = new RemapConfig( { mapper: mapper, original: c } );
+var r = new RemapConfig( { mapper: mapper, config: c } );
 
 console.log( r.get('new:foo:0') );
 // prints out "1"

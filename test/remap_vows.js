@@ -20,7 +20,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 		var mapper = function(old_name) {
 		    return {a:'e:f', b:'e:g', b:'d'}[old_name];
 		};
-		var remap = new RemapConfig({mapper: mapper, original: config});
+		var remap = new RemapConfig({mapper: mapper, config: config});
 		return remap;
 	    },
             'should be an object':          function(config) { assert.instanceOf(config,Configuration); },
@@ -40,7 +40,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 	    var mapper = function(old_name) {
 		return {a:'e:f', b:'e:g', c:'d'}[old_name];
 	    };
-	    var remap = new RemapConfig({mapper: mapper, original: config});
+	    var remap = new RemapConfig({mapper: mapper, config: config});
 	    config.set("a", 1);
 	    config.set("b", 2);
 	    config.set("c", 3);
@@ -68,7 +68,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 	    var mapper = function(old_name) {
 		return {a:'e:f', b:'e:g', c:'d'}[old_name];
 	    };
-	    var remap = new RemapConfig({mapper: mapper, original: config});
+	    var remap = new RemapConfig({mapper: mapper, config: config});
 	    config.set("a", 1);
 	    config.set("b", 2);
 	    config.set("c", 3);
@@ -91,7 +91,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 		var mapper = function(old_name) {
 		    return {a:'e:f', b:'e:g', c:'d'}[old_name];
 		};
-		var remap = new RemapConfig({mapper: mapper, original: config});
+		var remap = new RemapConfig({mapper: mapper, config: config});
 		var changes = [];
                 remap.on('change', function( change ) {
                     changes.push( change );
@@ -142,7 +142,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 		    }
 		    return undefined;
 		};
-		var remap = new RemapConfig({mapper: mapper, original: config});
+		var remap = new RemapConfig({mapper: mapper, config: config});
 		var changes = [];
                 remap.on('change', function( change ) {
                     changes.push( change );
@@ -177,7 +177,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 		    }
 		    return undefined;
 		};
-		var remap = new RemapConfig({mapper: mapper, original: config});
+		var remap = new RemapConfig({mapper: mapper, config: config});
 		var changes = [];
                 remap.on('change', function( change ) {
                     changes.push( change );
@@ -203,7 +203,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 	    var mapper = function(old_name) {
 		return {a:'e:f', b:'e:g', c:'d'}[old_name];
 	    };
-	    var remap = new RemapConfig({mapper: mapper, original: config});
+	    var remap = new RemapConfig({mapper: mapper, config: config});
 	    remap.on('state', function(state) {states.push(state);} );
 	    config.state('invalid', 'test1');
 	    config.state('invalid', 'test2'); 

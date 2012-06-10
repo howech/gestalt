@@ -11,7 +11,7 @@ var envMap = new gestalt.RemapConfig( {
 	"CENTRAL_ZOOKEEPER":"zookeeper:options:connect",
 	"CENTRAL_CLUSTER":  "cluster:name"
     },
-    original: new gestalt.ConfigEnv()
+    config: new gestalt.ConfigEnv()
 });
 
 var argsMap = new gestalt.RemapConfig({
@@ -21,7 +21,7 @@ var argsMap = new gestalt.RemapConfig({
 	"cluster":   "cluster:name",
 	"help":      "help"
     },
-    original: new gestalt.ConfigArgs( {
+    config: new gestalt.ConfigArgs( {
         optimist_usage: "Usage: $0 options\nStart a test cluster talking to zookeeper to coordinate naming and leader election.",
 	optimist_options: {
 	    z: { alias:    'zookeeper',
