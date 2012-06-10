@@ -357,7 +357,7 @@ vows.describe('gestalt configurtion objects').addBatch({
 	"4 state changes": function(states) {
 	    assert.equal( states.length, 4 );
 	    assert.deepEqual( _.pluck(states,'state'),
-			      ['invalid','invalid','not ready', 'ready'] );
+			      ['invalid','invalid','invalid', 'ready'] );
 	    assert.deepEqual( _.pluck(states,'data'),
 			      ['test1','test2','test3','test4' ] );
 	}

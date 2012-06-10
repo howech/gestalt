@@ -277,7 +277,7 @@ vows.describe("Gestalt Configuration Container Object").addBatch( {
 	"4 state changes": function(states) {
 	    assert.equal( states.length, 4 );
 	    assert.deepEqual( _.pluck(states,'state'),
-			      ['invalid','invalid','not ready', 'ready'] );
+			      ['invalid','invalid','invalid', 'ready'] );
 	    assert.deepEqual( _.pluck(states,'data'),
 			      ['test1','test2','test3','test4' ] );
 	}
@@ -307,7 +307,7 @@ vows.describe("Gestalt Configuration Container Object").addBatch( {
 	}, 
 	"states": function(states) {
 	    assert.deepEqual( states,
-			      ['ready','invalid','not ready'] );
+			      ['ready','invalid','invalid'] );
 	}
     }
 
