@@ -669,6 +669,12 @@ Boolean. If true, once connected to zookeeper, ZookeeperConfig will
 create the path of the zookeeper node it is trying to listen to, if 
 it is not already there.
 
+- include_stat
+
+Boolean. If true, zookeeper nodes will include a 'stat' name in addition
+to 'data' and 'children'. The stat object will contain the stats reported
+by the node's data callback.
+
 #### Methods
 
 - zookeeper( function(zk) )
