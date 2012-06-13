@@ -444,8 +444,20 @@ different.
 
 - get(name)
 
- Returns the value associated with the name of the highest priority object
- containing a defined value for the name. 
+ Returns the value associated with the name of the highest priority
+ object containing a defined value for the name. Actually, the real
+ contract is that the results of get will agree with the latest change
+ event for the object, which is effectively the highest priority
+ contained object's values, with the following caveat: unlike regular
+ Configuration objects, it is not well defined what will happen if you
+ get an intermediate Configuration value.
+
+```javascript
+var container = new gestalt.ConfigContainer();
+container.set("a:b:c",7);
+container.get("a:b:c") // returns 7
+container.get("a:b") // unspecified
+```
 
 - set(name, value, source)
 
