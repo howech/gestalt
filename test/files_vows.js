@@ -174,6 +174,16 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
     },
     "JSON File Watch": {
         topic: function() {
+	    // In this scenario, we are going to 
+	    // 1) write a file containing some json data.
+	    // 2) set up a config file watching it.
+	    // 3) Overwrite the file with different data.
+	    // 4) Delete the file
+	    // 5) wait for fallout
+
+	    // We will check that the changes emitted are correct
+	    // We will check that the state changes are correct
+
             var promise = new EventEmitter();
 
             var object1 = {a:1, b:2, c: [1,2,3], d: {e: 55, f: 66 } };
@@ -182,35 +192,55 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
             var writeStream = fs.createWriteStream(filename);
 	    var changes = [];
 	    var del = false;
+	    var results = { changes: [], states: [], invalids: 0 };
+
+	    var result_function = function(change, state) {
+		if(change) {
+		    results.changes.push(change);
+		} 
+		if(state) {
+		    results.states.push(state);
+		    if( state.state == 'invalid') {
+			results.invalids++
+		    }
+		}
+
+	    }
 
             writeStream.end( JSON.stringify( object1 ) );
 
             writeStream.on('close', function() {
                 var config = new ConfigFile( {source: filename, format: 'json', watch: true} );
+		var ready = false
                 config.on('state', function(state) {
-                    if( state.state == 'ready' ) {
+                    if( state.state == 'ready' && ! ready) {
+			ready = true;
                         var ws2 = fs.createWriteStream(filename);
                         ws2.on('close', function() {
-                            fs.unlink(filename, function() { } );
+			    setTimeout( function() {
+				fs.unlink(filename, function() { 
+				    setTimeout( function() {
+					promise.emit('success', results );
+				    }, 100 );
+				});
+			    }, 100 );
                         });
                         ws2.end( JSON.stringify(object2) );
                         
                         config.on('change', function(change) { 
-                            changes.push( change );
-			    if( changes.length == 8 ) {
-				promise.emit('success', changes );
-			    }
+			    result_function( change );
                         });
-                        
-                    }
+
+                    } 
+		    result_function(null, state );
                 });       
             });
 
             return promise;
         },
-        "test" : function(changes) {
+        "test changes" : function(results) {
 	    var change_obj = {};
-	    _.each( changes, function(change) {
+	    _.each( results.changes, function(change) {
 		change_obj[ change.name + "_" + change.value ] = change;
 	    });
 	    expected_results = {
@@ -267,6 +297,16 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
 	    _.each( expected_results, function(r,name) {
 		assert.deepEqual( change_obj[name], r );
 	    });
+	},
+	"test states": function(results) {
+	    var expected_state = "not ready";
+	    assert.equal( results.states.length, 7 );
+	    _.each( results.states, function( state ) {
+		assert.equal( state.old_state, expected_state );
+		expected_state = state.state;
+	    });
+	    assert.equal( expected_state, "invalid" );
+
         }
     }
 }).export(module);
