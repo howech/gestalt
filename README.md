@@ -347,9 +347,18 @@ can include colon separated hierarchical namespaces.
 
  Deletes the name from the configuration.
 
-- report( )
+- report( stream )
 
- Generates a detailed report (on console.log) of all of the names.
+ Generates a detailed report on the given stream (or stdout) of all of
+ the names and values in YAML format.
+
+- writeFile( filename, format )
+
+ Attempts to open a writeStream on the filename and writes the contents
+ of the configuration object to the file in the specified format. If format
+ is left out, 'json' is assumed. Valid options are 'json', 'yaml' and a 
+ function that takes a plain javascript object (the results of toObject() )
+ and returns a string or a buffer object.
 
 - toObject()
 
