@@ -1,4 +1,3 @@
-require('v8-profiler');
 var vows = require('vows'),
     assert = require('assert'),
     EventEmitter = require('events').EventEmitter,

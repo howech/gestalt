@@ -173,16 +173,21 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
 
     },
     "JSON File Watch": {
+        teardown: function(topic) {
+            
+            topic.config._watchr_.close();
+            delete topic.config._watchr_;
+        },
         topic: function() {
-	    // In this scenario, we are going to 
-	    // 1) write a file containing some json data.
-	    // 2) set up a config file watching it.
-	    // 3) Overwrite the file with different data.
-	    // 4) Delete the file
-	    // 5) wait for fallout
+            // In this scenario, we are going to 
+            // 1) write a file containing some json data.
+            // 2) set up a config file watching it.
+            // 3) Overwrite the file with different data.
+            // 4) Delete the file
+            // 5) wait for fallout
 
-	    // We will check that the changes emitted are correct
-	    // We will check that the state changes are correct
+            // We will check that the changes emitted are correct
+            // We will check that the state changes are correct
 
             var promise = new EventEmitter();
 
@@ -190,122 +195,124 @@ vows.describe( "Gestalt Configuration File Object").addBatch( {
             var object2 = {a:2, b:1, c: [3,2,1], d: {g: 55, h: 66 } };
             var filename = "./test_watch_file.json";
             var writeStream = fs.createWriteStream(filename);
-	    var changes = [];
-	    var del = false;
-	    var results = { changes: [], states: [], invalids: 0 };
+            var changes = [];
+            var del = false;
+            var results = { changes: [], states: [], invalids: 0 };
 
-	    var result_function = function(change, state) {
-		if(change) {
-		    results.changes.push(change);
-		} 
-		if(state) {
-		    results.states.push(state);
-		    if( state.state == 'invalid') {
-			results.invalids++
-		    }
-		}
+            var result_function = function(change, state) {
+                if(change) {
+                    results.changes.push(change);
+                } 
+                if(state) {
+                    results.states.push(state);
+                    if( state.state == 'invalid') {
+                        results.invalids++
+                    }
+                }
 
-	    }
+            }
 
             writeStream.end( JSON.stringify( object1 ) );
 
             writeStream.on('close', function() {
                 var config = new ConfigFile( {source: filename, format: 'json', watch: true} );
-		var ready = false
-                config.on('state', function(state) {
-                    if( state.state == 'ready' && ! ready) {
-			ready = true;
-                        var ws2 = fs.createWriteStream(filename);
-                        ws2.on('close', function() {
-			    setTimeout( function() {
-				fs.unlink(filename, function() { 
-				    setTimeout( function() {
-					promise.emit('success', results );
-				    }, 100 );
-				});
-			    }, 100 );
-                        });
-                        ws2.end( JSON.stringify(object2) );
-                        
-                        config.on('change', function(change) { 
-			    result_function( change );
-                        });
+                var ready = false
+                config.on('change', function(change) { 
+                    if( ready ) 
+                        result_function( change );
+                });
 
-                    } 
-		    result_function(null, state );
+                results.config = config;
+                config.on('state', function(state) {
+                    result_function(null, state );
+                    if( state.state == 'ready' && ! ready) {
+                        ready = true;
+                        setTimeout( function() {
+                            var ws2 = fs.createWriteStream(filename);
+                            ws2.end( JSON.stringify(object2) );
+                        }, 1000 );
+                    } else if (state.state == 'ready' && ready ) {
+                        // second ready state
+                        setTimeout( function() {
+                            fs.unlink(filename, function() { } );
+                        }, 1000 );
+                    } else if ( state.state == 'invalid' && ready ) {
+                        // invalid after ready
+                        promise.emit('success', results );
+                    }
                 });       
             });
 
             return promise;
         },
         "test changes" : function(results) {
-	    var change_obj = {};
-	    _.each( results.changes, function(change) {
-		change_obj[ change.name + "_" + change.value ] = change;
-	    });
-	    expected_results = {
-		"a_2": {
-		    "name": "a",
-		    "value": 2,
-		    "source": "./test_watch_file.json",
-		    "old_value": 1
-		},
-		"b_1": {
-		    "name": "b",
-		    "value": 1,
-		    "source": "./test_watch_file.json",
-		    "old_value": 2
-		},
-		"c:0_3": {
-		    "name": "c:0",
-		    "value": 3,
-		    "source": "./test_watch_file.json",
-		    "old_value": 1
-		},
-		"c:2_1": {
-		    "name": "c:2",
-		    "value": 1,
-		    "source": "./test_watch_file.json",
-		    "old_value": 3
-		},
-		"d:e_undefined": {
-		    "name": "d:e",
-		    "source": "./test_watch_file.json",
-		    "old_value": 55,
-		    "value": undefined
-		},
-		"d:f_undefined": {
-		    "name": "d:f",
-		    "source": "./test_watch_file.json",
-		    "old_value": 66,
-		    "value": undefined
-		},
-		"d:g_55": {
-		    "name": "d:g",
-		    "value": 55,
-		    "source": "./test_watch_file.json",
-		    "old_value": undefined
-		},
-		"d:h_66": {
-		    "name": "d:h",
-		    "value": 66,
-		    "source": "./test_watch_file.json",
-		    "old_value": undefined
-		}
-	    };
+            var change_obj = {};
+            _.each( results.changes, function(change) {
+                change_obj[ change.name + "_" + change.value ] = change;
+            });
+            expected_results = {
+                "a_2": {
+                    "name": "a",
+                    "value": 2,
+                    "source": "./test_watch_file.json",
+                    "old_value": 1
+                },
+                "b_1": {
+                    "name": "b",
+                    "value": 1,
+                    "source": "./test_watch_file.json",
+                    "old_value": 2
+                },
+                "c:0_3": {
+                    "name": "c:0",
+                    "value": 3,
+                    "source": "./test_watch_file.json",
+                    "old_value": 1
+                },
+                "c:2_1": {
+                    "name": "c:2",
+                    "value": 1,
+                    "source": "./test_watch_file.json",
+                    "old_value": 3
+                },
+                "d:e_undefined": {
+                    "name": "d:e",
+                    "source": "./test_watch_file.json",
+                    "old_value": 55,
+                    "value": undefined
+                },
+                "d:f_undefined": {
+                    "name": "d:f",
+                    "source": "./test_watch_file.json",
+                    "old_value": 66,
+                    "value": undefined
+                },
+                "d:g_55": {
+                    "name": "d:g",
+                    "value": 55,
+                    "source": "./test_watch_file.json",
+                    "old_value": undefined
+                },
+                "d:h_66": {
+                    "name": "d:h",
+                    "value": 66,
+                    "source": "./test_watch_file.json",
+                    "old_value": undefined
+                }
+            };
 
-	    _.each( expected_results, function(r,name) {
-		assert.deepEqual( change_obj[name], r );
-	    });
-	},
-	"test states": function(results) {
-	    var expected_state = "not ready";
-	    assert.equal( results.states.length, 7 );
-	    _.each( results.states, function( state ) {
-		assert.equal( state.old_state, expected_state );
-		expected_state = state.state;
-	    });
-	    assert.equal( expected_state, "invalid" );
+            _.each( expected_results, function(r,name) {
+                assert.deepEqual( change_obj[name], r );
+            });
+        },
+        "test states": function(results) {
+            var expected_state = "not ready";
+            assert.equal( results.states.length, 5 );
+            _.each( results.states, function( state ) {
+                assert.equal( state.old_state, expected_state );
+                expected_state = state.state;
+            });
+            assert.equal( expected_state, "invalid" );
 
         }
     }
