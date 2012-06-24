@@ -541,6 +541,17 @@ remap = function(old_value) {
  not present in the remap object, will simply not be included in the
  resultant object.
 
+ -reverse (optional)
+
+ Specifies how to map new names back into old names. The reverse
+ function is calculated automatically if a structure mapper was
+ used. Reverse and Mapper should be inverses of each other over the
+ range of kkeys that are not mapped out of the model. If the reverse
+ function is not given, set and update functions will only be able to
+ modify existing values in the structure. With the reverse function,
+ they will also be able to set new values and have them map back to
+ the original structure.
+
 ### Methods
 
 All of the Configuration public methods are supported, with the following

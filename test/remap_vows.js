@@ -62,7 +62,7 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
             assert.deepEqual( keys.sort(), each_keys.sort() );
         }
     },
-    'mapped config read only': {
+    'mapped config not read only': {
         topic: function() {
 	    var config = new Configuration({source: "basic config object"});
 	    var mapper = function(old_name) {
@@ -75,12 +75,14 @@ vows.describe("Gestalt Configuration Remap Object").addBatch( {
 	    remap.set("d", 0);
 	    remap.set("e:f", 0);
 	    remap.set(["e","g"],0);
+	    remap.remove("a");
 	    return remap;
         },
         'writes were not effective': function(remap) { 
-	    assert.equal( remap.get("d"), 3 );
-	    assert.equal( remap.get("e:f"), 1);
-	    assert.equal( remap.get("e:g"), 2);
+	    assert.equal( remap.get("d"), 0 );
+	    assert.equal( remap.get("e:f"), 0);
+	    assert.equal( remap.get("e:g"), 0);
+	    assert.isUndefined( remap.get("a") );
         },
     },
 
