@@ -7,25 +7,24 @@ application is still running. Gestalt provides a framework detecting
 and reacting to these changes without having to completely restart
 your application.
 
-There are a couple of motivations for gestalt: Configuration of a
-large software system is often complicated - there are of course many
-tools out there for gathering configuration information from a bunch
-of different sources. nconf for node is a good one, and gestalt is to
-some extent based upon it. Gestalt is also influenced by configliere
-for ruby and the configuration node structure of chef. However, there
-are a couple of things that many of these tools do not do well. First,
-configuration files (and other sources) can change, and it would be
-nice to be able to react to these changes on-the-fly. Second, for a
-sufficiently complicated system of default and override configuration
-sources, it can become difficult to figure out exactly where a
-particular setting came from. 
+Configuration of a large software system is often complicated - there
+are of course many tools out there for gathering configuration
+information from a bunch of different sources. nconf for node is a
+good one, and gestalt is to some extent based upon it. Gestalt is also
+influenced by configliere for ruby and the configuration node
+structure of chef. However, there are a couple of things that many of
+these tools do not do well. First, configuration files (and other
+sources) can change, and it would be nice to be able to react to these
+changes on-the-fly. Second, for a sufficiently complicated system of
+default and override configuration sources, it can become difficult to
+figure out exactly where a particular setting came from.
 
 Gestalt solves both of these problems. It has a per-value event change
 tracking system so that you can track changes to individual settings
-to your configuration. It also rigorously keeps track of where the
-values for particular settings came from.
+to your configuration. It also rigorously tracks the sources of configuration
+values and can generate a complete report of all values and sources.
 
-## Basics
+## Usage
 
 The basic object is a Configuration:
 
@@ -73,8 +72,8 @@ var fred_phone = config.get( 'neighbor:phone' );
 the destructure_assignments and destructure_arrays options, below. )
 
 It is possible to turn a configuration object back into a regular
-object. Also, if a configuration object looks like an array (all
-integer keys...)  toObject will in fact return an array.
+object. If a configuration object looks like an array (all
+integer keys, contiguous from zero)  toObject will in fact return an array.
 
 ## Events
 
@@ -98,24 +97,13 @@ The nested configuration objects are also event emitters. Note that
 the configuration names in the events are reported relative to the
 configuration object being listening to.
 
-Configuration objects also have a ready/invalid/other state. When
-everything about the configuration is loaded the way it expects that
-it should be, it enters a 'ready' state.  If something has gone wrong
-in a way that might require some attention, it enters an 'invalid'
-state. Other states are possible - most configuration objects start in
-a 'not ready' state, but particular implementations might add some other
-special states. 
+Configuration objects also have a ready/invalid/other state.  State
+propagates from children to parents and from contained objects to
+containers.  On state transitions (and whenever further 'invalid'
+states are encountered) configuration objects will emit a 'state'
+message. The payload object is of the form:
 
-State propagates from children to parents and from contained objects
-to containers.  The parent/container will become invalid if any of its
-children/contents become 'invalid'. Also, a parent/container will only become
-'ready' if all of its children/contents are 'ready'. If no sub-configuration
-is invalid, but not all of them are ready, parents and containers become
-'not ready'. 
 
-On state transitions (and whenever further 'invalid' states are
-encountered) configuration objects will emit a 'state' message. The
-payload object is of the form:
 
 ```javascript
 { state: 'ready',
@@ -124,7 +112,7 @@ payload object is of the form:
 }
 ```
 
-To reiterate, there are three main states a Configuration object can
+There are three main states a Configuration object can
 be in:
 
 - 'ready' This means that there were no problems getting to the
@@ -204,7 +192,10 @@ what part of the structure a given command line argument will override.
 The constructor for RemapConfig expects to see a couple of options in
 the options argument. First, it needs a reference to the original
 configuration object that is being remapped. Second, it needs a function
-that will map names from the original object into the new object space.
+that will map names from the original object into the new object space. Optionally, 
+you can provide a function that maps new configuration names back to the old
+configuration names - this is only really needed if you need full write support
+on the remapped object.
 
 ```javascript
 
@@ -217,10 +208,19 @@ function mapper(old) {
     // map names that start with "f" to
     // new:<old_name>
     if( old.match(/^f/ )) {
-	return "new:" + old;	
+	    return "new:" + old;	
     } else {
-	// ignore everything else
-	return undefined;
+	    // ignore everything else
+	    return undefined;
+    }
+}
+
+function reverse(new) {
+   // map names that start with "new:" to the old name
+   if( new.match(/^new:/) {
+       return new.substring(4);
+    } else {
+	   return undefined;
     }
 }
 
@@ -228,7 +228,7 @@ var c = new Configuration();
 c.set("foo",1);
 c.set("gak",4);
 
-var r = new RemapConfig( { mapper: mapper, original: c } );
+var r = new RemapConfig( { mapper: mapper, reverse: reverse, original: c } );
 
 console.log( r.get('new:foo') );
 // prints out "1"
@@ -236,18 +236,9 @@ console.log( r.get('new:foo') );
 ```
 
 The mapper can be a function as above, or it can be a simple
-java object with old values as keys and new values as corresponding
+javascript object with old values as keys and new values as corresponding
 values. Keys not present in the object will be mapped out of the
-RemapConfig.
-
-Not surprisingly, there are a couple of restrictions on this type of
-configuration object. First, it is read only. Second, the mapper
-function can show that it ignores part of the object space by
-returning undefined for some values. For the rest of the values, it
-must make sure to return unique new names for different old names.
-
-Remapped objects do pass on events, and can be used as overrides or
-defaults in a config container. 
+RemapConfig. (Also, the reverse mapping is calculated automatically.) 
 
 ## API
 
@@ -350,7 +341,7 @@ can include colon separated hierarchical namespaces.
 - report( stream )
 
  Generates a detailed report on the given stream (or stdout) of all of
- the names and values in YAML format.
+ the names and values in YAML format with comments indicating sources.
 
 - writeFile( filename, format )
 
