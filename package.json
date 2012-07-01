@@ -22,8 +22,7 @@
       "watchr": ">= 2.1.0"
   },
   "devDependencies": {
-      "vows": ">= 0.6.2",
-      "zookeeper": ">= 3.4.0"
+      "vows": ">= 0.6.2"
   },
   "bundleDependencies": [
   ],
