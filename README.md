@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/howech/gestalt.png)](http://travis-ci.org/howech/gestalt)
 # gestalt
 
 Gestalt is a library for managing configuration information for
