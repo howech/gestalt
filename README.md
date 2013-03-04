@@ -7,6 +7,7 @@ application is still running. Gestalt provides a framework detecting
 and reacting to these changes without having to completely restart
 your application.
 
+
 Configuration of a large software system is often complicated - there
 are of course many tools out there for gathering configuration
 information from a bunch of different sources. nconf for node is a
