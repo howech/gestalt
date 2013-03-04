@@ -18,5 +18,13 @@ vows.describe( "Gestalt Configuration Arguments Object").addBatch( {
                 assert.equal( config.get("foo"), "bar" );
             }        
         }
-    }
+    },
+   'artificial failure': {
+       "FAIL": { 
+	   topic: 2,
+	   'FAIL': function(config) {
+	       assert.equal(config, 3);
+	   }
+       }
+   }
 }).export(module);
